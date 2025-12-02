@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy Backend Code
 COPY backend ./backend
-COPY verify_phase1.py .
+COPY verify_deployment.py .
 
 # Copy Built Frontend from Stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
