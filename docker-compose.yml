@@ -9,7 +9,7 @@ services:
     ports:
       - "8222:8222"
     volumes:
-      - /volume1/docker/kaos/data:/app/data
+      - ./data:/app/data
     restart: unless-stopped
     environment:
       - DATABASE_URL=sqlite:////app/data/magazzino.db
