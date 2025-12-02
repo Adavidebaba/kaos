@@ -33,3 +33,22 @@ def health_check():
 
 # Serve static files for images
 app.mount("/uploads", StaticFiles(directory="data/uploads"), name="uploads")
+
+# Serve Frontend (SPA)
+# Mount assets first to avoid catching them with the SPA catch-all
+if os.path.exists("frontend/dist/assets"):
+    app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+
+# Catch-all for SPA
+from fastapi.responses import FileResponse
+
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    # If API or Uploads, let them pass (though API is handled by routers above)
+    if full_path.startswith("api") or full_path.startswith("uploads"):
+        return {"detail": "Not Found"} # Should be handled by routers/mounts, but safety check
+    
+    # Serve index.html for everything else
+    if os.path.exists("frontend/dist/index.html"):
+        return FileResponse("frontend/dist/index.html")
+    return {"detail": "Frontend not found. Did you build it?"}
