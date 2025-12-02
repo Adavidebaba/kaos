@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  kaos:
+    container_name: kaos
+    # Build from local context
+    build: .
+    # build: https://github.com/Adavidebaba/kaos.git
+    ports:
+      - "8222:8222"
+    volumes:
+      - /volume1/docker/kaos/data:/app/data
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite:////app/data/magazzino.db
+
+# Note: On Synology, you might need to use 'docker-compose up --build' 
+# or ensure the build context is supported. 
+# If 'build' from URL fails on Synology UI, clone the repo and use 'build: .'

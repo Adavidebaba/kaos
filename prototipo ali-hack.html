@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!-- 
+    PROTOPO "ALI-HACK" (Clean Intent Sharing)
+    
+    OBIETTIVO: 
+    Attivare la ricerca visiva nativa (Google Lens, AliExpress, Temu) su mobile 
+    partendo da una Web App (PWA).
+
+    LOGICA CRITICA PER LO SVILUPPATORE:
+    1. Ridimensionamento: L'immagine deve essere ridotta (max 800-1000px) client-side 
+       prima della condivisione per evitare che lo Share Sheet di iOS si blocchi o sia lento.
+    2. Intent Pulito: navigator.share() deve ricevere SOLO l'array 'files'. 
+       NON includere 'title' o 'text'. Se si includono, iOS interpreta l'intent come 
+       "Invio Messaggio" e nasconde le app di shopping/ricerca.
+    3. Auto-Paste: Usare l'evento 'visibilitychange' per intercettare quando l'utente 
+       torna dall'app esterna e tentare l'incolla automatico (o mostrare feedback).
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Magazzino - Ali-Hack Reference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .no-select { user-select: none; -webkit-user-select: none; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col font-sans no-select p-4">
+
+    <div class="max-w-md mx-auto w-full border border-yellow-600 rounded-xl p-4 bg-gray-800">
+        <h1 class="text-xl font-bold text-yellow-500 mb-2">Reference Implementation</h1>
+        <p class="text-xs text-gray-400 mb-6">Usa questo codice per il componente "Magic Search".</p>
+
+        <!-- UI Simulazione -->
+        <div class="flex flex-col gap-4">
+            
+            <!-- Input Camera -->
+            <label class="block text-sm font-bold text-gray-300">1. Input Sorgente</label>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" 
+                   class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+
+            <!-- Preview & Azione -->
+            <div id="actionArea" class="hidden flex flex-col gap-4 mt-4 border-t border-gray-700 pt-4">
+                <div class="flex justify-center bg-black/50 rounded-lg p-2">
+                    <img id="preview" class="h-32 object-contain">
+                </div>
+                
+                <button onclick="shareImageLogic()" class="w-full py-4 bg-yellow-600 hover:bg-yellow-500 rounded-lg font-bold text-lg shadow-lg flex items-center justify-center gap-2">
+                    <span>🚀 Avvia Ricerca Visiva</span>
+                </button>
+                <p class="text-[10px] text-gray-400 text-center">Invoca navigator.share([file]) senza metadati</p>
+
+                <!-- Area Risultato -->
+                <div class="mt-2">
+                    <label class="text-xs text-gray-400">Descrizione (Auto-Paste al ritorno)</label>
+                    <textarea id="descInput" placeholder="In attesa di ritorno dall'app..." 
+                              class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white h-20 text-sm mt-1 focus:border-yellow-500 outline-none"></textarea>
+                    <div id="pasteFeedback" class="hidden text-green-400 text-xs font-bold mt-1 text-center">✨ Testo incollato automaticamente!</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentBlob = null;
+        const cameraInput = document.getElementById('cameraInput');
+        const actionArea = document.getElementById('actionArea');
+        const preview = document.getElementById('preview');
+        const descInput = document.getElementById('descInput');
+        const pasteFeedback = document.getElementById('pasteFeedback');
+
+        // 1. GESTIONE INPUT & RESIZE (Fondamentale per performance)
+        cameraInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                // Resize a 800px per non bloccare la memoria del telefono durante lo share
+                // Questo passaggio è CRITICO su Android low-end e vecchi iPhone
+                currentBlob = await resizeImage(file, 800, 0.8);
+                
+                preview.src = URL.createObjectURL(currentBlob);
+                actionArea.classList.remove('hidden');
+            } catch (err) {
+                alert("Errore resize: " + err);
+            }
+        });
+
+        // 2. LOGICA SHARE (Clean Intent)
+        async function shareImageLogic() {
+            if (!currentBlob) return;
+            
+            // Creiamo un File object fresco con nome generico
+            const fileToShare = new File([currentBlob], "search_item.jpg", { type: "image/jpeg" });
+
+            // Feature Detection
+            if (navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
+                try {
+                    // *** PUNTO CRITICO ***
+                    // Passare SOLO 'files'.
+                    // NON passare 'title' o 'text'.
+                    // Se passi testo, l'OS pensa che sia un messaggio e nasconde AliExpress/Temu.
+                    await navigator.share({
+                        files: [fileToShare]
+                    });
+                    console.log("Share sheet aperto.");
+                } catch (err) {
+                    if (err.name !== 'AbortError') alert("Errore Share: " + err.message);
+                }
+            } else {
+                alert("Web Share API non supportata (o contesto non HTTPS).");
+            }
+        }
+
+        // 3. AUTO-PASTE LOGIC (Visibility API)
+        // Scatta quando l'utente torna sull'app dopo aver copiato il testo altrove
+        document.addEventListener("visibilitychange", async () => {
+            if (document.visibilityState === "visible" && !actionArea.classList.contains('hidden')) {
+                try {
+                    // Tenta di leggere la clipboard
+                    const text = await navigator.clipboard.readText();
+                    
+                    // Se c'è testo ed è diverso da quello che avevamo (o è vuoto)
+                    if (text && text.length > 0 && descInput.value !== text) {
+                        descInput.value = text;
+                        
+                        // Feedback Visivo
+                        pasteFeedback.classList.remove('hidden');
+                        descInput.classList.add('bg-gray-700');
+                        setTimeout(() => {
+                            pasteFeedback.classList.add('hidden');
+                            descInput.classList.remove('bg-gray-700');
+                        }, 3000);
+                    }
+                } catch (err) {
+                    console.log("Auto-paste bloccato dal browser (richiede permesso esplicito o focus).");
+                }
+            }
+        });
+
+        // Utility: Resize Immagine su Canvas
+        function resizeImage(file, maxWidth, quality) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const elem = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Mantieni aspect ratio
+                        if (width > maxWidth) {
+                            height = height * (maxWidth / width);
+                            width = maxWidth;
+                        }
+                        
+                        elem.width = width;
+                        elem.height = height;
+                        const ctx = elem.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Converti in Blob JPEG
+                        ctx.canvas.toBlob((blob) => {
+                            resolve(blob);
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = (e) => reject(e);
+                };
+                reader.onerror = (e) => reject(e);
+            });
+        }
+    </script>
+</body>
+</html>
