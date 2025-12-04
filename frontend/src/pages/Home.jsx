@@ -60,7 +60,7 @@ export function HomePage() {
 
             {/* ============== SEZIONE CERCA ============== */}
             <section>
-                <h2 className="text-sm font-semibold text-dark-500 uppercase tracking-wider mb-3">
+                <h2 className="text-base font-bold text-amber-500 mb-3">
                     🔍 Cerca
                 </h2>
                 <div className="grid grid-cols-3 gap-3">
@@ -99,13 +99,13 @@ export function HomePage() {
 
             {/* ============== SEZIONE AGGIUNGI ============== */}
             <section>
-                <h2 className="text-sm font-semibold text-dark-500 uppercase tracking-wider mb-3">
+                <h2 className="text-base font-bold text-amber-500 mb-3">
                     ➕ Aggiungi oggetto
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                     <button
                         onClick={openScanner}
-                        className="btn-primary py-4 text-base"
+                        className="btn-secondary py-4 text-base"
                     >
                         📷 Scansiona Scatola
                     </button>
@@ -121,7 +121,7 @@ export function HomePage() {
             {/* ============== SEZIONE PRESI IN MANO ============== */}
             {pocketItems.length > 0 && (
                 <section>
-                    <h2 className="text-sm font-semibold text-dark-500 uppercase tracking-wider mb-3">
+                    <h2 className="text-base font-bold text-amber-500 mb-3">
                         ✋ Presi in mano ({pocketItems.length})
                     </h2>
 
