@@ -20,10 +20,17 @@ export function HomePage() {
         queryFn: statsApi.get
     })
 
-    // Fetch items in hand details
+    // Fetch dettagli items in mano (basato su pocketItems IDs)
     const { data: inHandItems } = useQuery({
-        queryKey: ['items-in-hand', pocketItems],
-        queryFn: () => itemsApi.inHand(),
+        queryKey: ['pocket-items-details', pocketItems],
+        queryFn: async () => {
+            // Fetch ogni item per ID
+            const items = await Promise.all(
+                pocketItems.map(id => itemsApi.get(id).catch(() => null))
+            )
+            // Filtra null (items eliminati o non trovati)
+            return items.filter(item => item !== null)
+        },
         enabled: pocketItems.length > 0
     })
 
