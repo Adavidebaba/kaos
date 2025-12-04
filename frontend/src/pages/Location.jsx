@@ -42,9 +42,16 @@ export function LocationPage() {
 
     // Se location non esiste, mostra modal "Claim"
     useEffect(() => {
-        if (error && error.message.includes('404')) {
-            setShowClaimModal(true)
-            setClaimName(`Scatola ${locationId}`)
+        if (error) {
+            // Controlla sia status HTTP 404 che messaggi comuni di "non trovato"
+            const isNotFound = error.message.includes('404') ||
+                error.message.toLowerCase().includes('non trovata') ||
+                error.message.toLowerCase().includes('not found')
+
+            if (isNotFound) {
+                setShowClaimModal(true)
+                setClaimName(`Scatola ${locationId}`)
+            }
         }
     }, [error, locationId])
 
