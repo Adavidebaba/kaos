@@ -2,7 +2,7 @@
  * LocationPage - Vista singola scatola con items
  * Gestisce Deep Linking da QR Code
  */
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { locationsApi, itemsApi } from '../api'
@@ -17,8 +17,8 @@ export function LocationPage() {
     const { showToast } = useUIStore()
 
     const [showCamera, setShowCamera] = useState(false)
-    const [showClaimModal, setShowClaimModal] = useState(false)
     const [claimName, setClaimName] = useState('')
+    const [isClaiming, setIsClaiming] = useState(false)
 
     const locationId = parseInt(id, 10)
 
@@ -40,31 +40,21 @@ export function LocationPage() {
         enabled: !!location
     })
 
-    // Se location non esiste, mostra modal "Claim"
-    useEffect(() => {
-        if (error) {
-            // Controlla sia status HTTP 404 che messaggi comuni di "non trovato"
-            const isNotFound = error.message.includes('404') ||
-                error.message.toLowerCase().includes('non trovata') ||
-                error.message.toLowerCase().includes('not found')
-
-            if (isNotFound) {
-                setShowClaimModal(true)
-                setClaimName(`Scatola ${locationId}`)
-            }
-        }
-    }, [error, locationId])
+    // Verifica se è un errore 404 (location non esiste)
+    const isNotFoundError = error && (
+        error.message.includes('404') ||
+        error.message.toLowerCase().includes('non trovata') ||
+        error.message.toLowerCase().includes('not found')
+    )
 
     // Claim (crea) nuova location
     const handleClaim = async () => {
-        if (!claimName.trim()) return
+        const name = claimName.trim() || `Scatola ${locationId}`
 
+        setIsClaiming(true)
         try {
-            await locationsApi.claim(locationId, {
-                name: claimName.trim()
-            })
+            await locationsApi.claim(locationId, { name })
 
-            setShowClaimModal(false)
             showToast('✅ Scatola creata!', 'success')
 
             // Refresh data
@@ -75,6 +65,8 @@ export function LocationPage() {
             setShowCamera(true)
         } catch (err) {
             showToast(`❌ ${err.message}`, 'error')
+        } finally {
+            setIsClaiming(false)
         }
     }
 
@@ -95,8 +87,8 @@ export function LocationPage() {
         return <LoadingPage message="Caricamento scatola..." />
     }
 
-    // Modal Claim (nuova scatola)
-    if (showClaimModal) {
+    // Location non esiste -> Modal per crearla
+    if (isNotFoundError) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
                 <div className="card p-6 max-w-sm w-full animate-slide-up">
@@ -111,7 +103,7 @@ export function LocationPage() {
                         type="text"
                         value={claimName}
                         onChange={(e) => setClaimName(e.target.value)}
-                        placeholder="Nome scatola"
+                        placeholder={`Scatola ${locationId}`}
                         className="input mb-4"
                         autoFocus
                     />
@@ -120,14 +112,16 @@ export function LocationPage() {
                         <button
                             onClick={() => navigate('/')}
                             className="btn-secondary flex-1"
+                            disabled={isClaiming}
                         >
                             Annulla
                         </button>
                         <button
                             onClick={handleClaim}
                             className="btn-primary flex-1"
+                            disabled={isClaiming}
                         >
-                            ✅ Crea
+                            {isClaiming ? '⏳ Creazione...' : '✅ Crea'}
                         </button>
                     </div>
                 </div>
@@ -147,7 +141,7 @@ export function LocationPage() {
         )
     }
 
-    // Vista normale
+    // Location non trovata (altro tipo di errore)
     if (!location) {
         return (
             <EmptyState
