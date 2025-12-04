@@ -15,8 +15,30 @@ def init_database():
     # Crea tabelle base
     Base.metadata.create_all(bind=engine)
     
+    # Esegui migrazioni per colonne mancanti
+    _run_migrations()
+    
     # Setup FTS5 per ricerca veloce
     _setup_fts5()
+
+
+def _run_migrations():
+    """
+    Esegue migrazioni per aggiungere colonne mancanti.
+    Safe to run multiple times.
+    """
+    with engine.connect() as conn:
+        # Migrazione: aggiungi created_at a locations se non esiste
+        result = conn.execute(text(
+            "PRAGMA table_info(locations)"
+        ))
+        columns = [row[1] for row in result.fetchall()]
+        
+        if 'created_at' not in columns:
+            conn.execute(text(
+                "ALTER TABLE locations ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
+            ))
+            conn.commit()
 
 
 def _setup_fts5():
