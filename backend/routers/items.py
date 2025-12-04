@@ -158,6 +158,20 @@ def get_item(
             detail="Item non trovato"
         )
     
+    # Se item è in mano, usa previous_location per mostrare la scatola originale
+    if item.status == ItemStatus.IN_HAND and item.previous_location_id:
+        prev_loc = db.query(Location).filter(Location.id == item.previous_location_id).first()
+        return ItemResponse(
+            id=item.id,
+            location_id=item.previous_location_id,
+            location_name=prev_loc.name if prev_loc else None,
+            photo_path=item.photo_path,
+            thumbnail_path=item.thumbnail_path,
+            description=item.description,
+            status=item.status,
+            created_at=item.created_at
+        )
+    
     return ItemResponse(
         id=item.id,
         location_id=item.location_id,
@@ -293,7 +307,7 @@ def pick_item(
 ):
     """
     Prende un item in mano (Pocket Logic: PRENDO ✋).
-    Imposta status IN_HAND e rimuove da location.
+    Salva previous_location_id per ricordare la scatola originale.
     """
     item = db.query(Item).filter(
         Item.id == item_id,
@@ -306,16 +320,27 @@ def pick_item(
             detail="Item non trovato"
         )
     
+    # Salva la location originale prima di metterla a None
+    if item.location_id:
+        item.previous_location_id = item.location_id
+    
     item.status = ItemStatus.IN_HAND
     item.location_id = None
     
     db.commit()
     db.refresh(item)
     
+    # Recupera nome previous location
+    prev_loc_name = None
+    if item.previous_location_id:
+        prev_loc = db.query(Location).filter(Location.id == item.previous_location_id).first()
+        if prev_loc:
+            prev_loc_name = prev_loc.name
+    
     return ItemResponse(
         id=item.id,
-        location_id=None,
-        location_name=None,
+        location_id=item.previous_location_id,  # Ritorna la scatola originale!
+        location_name=prev_loc_name,
         photo_path=item.photo_path,
         thumbnail_path=item.thumbnail_path,
         description=item.description,

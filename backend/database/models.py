@@ -78,6 +78,11 @@ class Item(Base):
         ForeignKey("locations.id"), 
         nullable=True  # Null quando IN_HAND
     )
+    previous_location_id = Column(
+        Integer, 
+        ForeignKey("locations.id"), 
+        nullable=True  # Ricorda la location originale quando in mano
+    )
     photo_path = Column(String(255), nullable=False)
     thumbnail_path = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
@@ -90,8 +95,9 @@ class Item(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     deleted_at = Column(DateTime, nullable=True)  # Soft delete
     
-    # Relationship
-    location = relationship("Location", back_populates="items")
+    # Relationships
+    location = relationship("Location", back_populates="items", foreign_keys=[location_id])
+    previous_location = relationship("Location", foreign_keys=[previous_location_id])
     
     @property
     def is_deleted(self) -> bool:

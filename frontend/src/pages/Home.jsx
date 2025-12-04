@@ -195,7 +195,7 @@ export function HomePage() {
                         onClick={handleSpostaTutti}
                         className="w-full btn bg-amber-500 text-dark-900 font-bold py-4 rounded-2xl"
                     >
-                        🚀 Sposta {pocketItems.length > 1 ? 'TUTTI ' : ''}in nuova scatola
+                        ↪️ Sposta {pocketItems.length > 1 ? 'TUTTI ' : ''}in nuova scatola
                     </button>
                 </section>
             )}
