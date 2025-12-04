@@ -97,7 +97,7 @@ def search_items(
             location_name=loc_name,
             thumbnail_path=row.thumbnail_path,
             description=row.description,
-            status=ItemStatus(row.status),
+            status=ItemStatus(row.status.lower() if isinstance(row.status, str) else row.status.value),
             rank=abs(row.rank)  # FTS5 rank è negativo
         ))
     
