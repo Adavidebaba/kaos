@@ -2,7 +2,7 @@
  * ScannerView - Scanner QR Code per scansione scatole
  * Supporta: navigazione, riponi tutti, riponi singolo
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useScanner } from '../../hooks'
 import { useUIStore, usePocketStore } from '../../store'
@@ -14,18 +14,20 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
     const { pocketItems, removeFromPocket, clearPocket } = usePocketStore()
     const containerId = useRef(`scanner-${Date.now()}`).current
 
-    // Controlla se c'è un singolo item da riporre (salvato da Home.jsx)
-    const [singleItemId, setSingleItemId] = useState(null)
+    // Usa ref per evitare problemi di closure con singleItemId
+    const singleItemIdRef = useRef(null)
 
+    // Leggi subito da sessionStorage (sincrono, prima del render)
     useEffect(() => {
         const savedItemId = sessionStorage.getItem('reponi_single_item')
         if (savedItemId) {
-            setSingleItemId(parseInt(savedItemId, 10))
+            singleItemIdRef.current = parseInt(savedItemId, 10)
             sessionStorage.removeItem('reponi_single_item')
+            console.log('🎯 Single item mode:', singleItemIdRef.current)
         }
     }, [])
 
-    const handleScan = async (qrText) => {
+    const handleScan = useCallback(async (qrText, parseLocationFromQR) => {
         // Parse location ID dal QR
         const locationId = parseLocationFromQR(qrText)
 
@@ -40,10 +42,13 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
         }
 
         // CASO 1: Riponi singolo item
+        const singleItemId = singleItemIdRef.current
         if (singleItemId) {
+            console.log('📦 Moving single item:', singleItemId, 'to location:', locationId)
             try {
                 await itemsApi.bulkMove([singleItemId], locationId)
                 removeFromPocket(singleItemId)
+                singleItemIdRef.current = null
                 showToast('✅ Oggetto spostato!', 'success')
                 closeScanner()
             } catch (err) {
@@ -54,6 +59,7 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
 
         // CASO 2: Pocket mode - sposta TUTTI gli items nella location
         if (mode === 'pocket' && pocketItems.length > 0) {
+            console.log('📦 Moving all pocket items:', pocketItems, 'to location:', locationId)
             try {
                 await itemsApi.bulkMove(pocketItems, locationId)
                 clearPocket()
@@ -68,9 +74,11 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
         // CASO 3: Navigate mode - vai alla location
         closeScanner()
         navigate(`/loc/${locationId}`)
-    }
+    }, [mode, pocketItems, showToast, closeScanner, removeFromPocket, clearPocket, navigate])
 
-    const { containerRef, isScanning, error, startScanning, stopScanning, parseLocationFromQR } = useScanner(handleScan)
+    const { containerRef, isScanning, error, startScanning, stopScanning, parseLocationFromQR } = useScanner(
+        (qrText) => handleScan(qrText, parseLocationFromQR)
+    )
 
     // Avvia scanner all'apertura
     useEffect(() => {
@@ -92,13 +100,14 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
         stopScanning()
         // Pulisci eventuali item singoli salvati
         sessionStorage.removeItem('reponi_single_item')
+        singleItemIdRef.current = null
         if (onClose) onClose()
         else closeScanner()
     }
 
     // Determina il messaggio da mostrare
     const getMessage = () => {
-        if (singleItemId) {
+        if (singleItemIdRef.current) {
             return '📦 Scansiona dove posare l\'oggetto'
         }
         if (mode === 'pocket' && pocketItems.length > 0) {
