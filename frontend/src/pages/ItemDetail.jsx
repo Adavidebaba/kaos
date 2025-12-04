@@ -123,6 +123,31 @@ export function ItemDetailPage() {
                 ← Indietro
             </button>
 
+            {/* Quick Actions - Sopra la foto */}
+            <div className="grid grid-cols-2 gap-3">
+                {inPocket ? (
+                    <button
+                        onClick={handleRiponi}
+                        className="btn bg-amber-500 text-dark-900 font-bold"
+                    >
+                        📦 Riponi
+                    </button>
+                ) : (
+                    <button
+                        onClick={handlePick}
+                        className="btn-primary"
+                    >
+                        ✋ Prendi
+                    </button>
+                )}
+                <button
+                    onClick={() => openScanner('navigate')}
+                    className="btn-secondary"
+                >
+                    🚀 Sposta
+                </button>
+            </div>
+
             {/* Image */}
             <div className="card overflow-hidden">
                 <img
@@ -238,33 +263,8 @@ export function ItemDetailPage() {
                 </div>
             </div>
 
-            {/* Actions */}
+            {/* Additional Actions */}
             <div className="space-y-3">
-                {/* Prendi / Riponi */}
-                <div className="grid grid-cols-2 gap-3">
-                    {inPocket ? (
-                        <button
-                            onClick={handleRiponi}
-                            className="btn bg-amber-500 text-dark-900 font-bold"
-                        >
-                            📦 Riponi
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handlePick}
-                            className="btn-primary"
-                        >
-                            ✋ Prendi
-                        </button>
-                    )}
-                    <button
-                        onClick={openScanner}
-                        className="btn-secondary"
-                    >
-                        🚀 Sposta
-                    </button>
-                </div>
-
                 {/* Quick return to original location (if in pocket and has location) */}
                 {inPocket && item.location_name && (
                     <button
