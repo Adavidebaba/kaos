@@ -57,10 +57,17 @@ export function Layout() {
             {pocketItems.length > 0 && (
                 <div className="fixed bottom-16 inset-x-0 z-20 px-4 pb-2 animate-slide-up">
                     <button
-                        onClick={openScanner}
+                        onClick={() => {
+                            const msg = pocketItems.length === 1
+                                ? '⚠️ Scansiona il QR della scatola dove vuoi posare l\'oggetto.'
+                                : `⚠️ Stai per posare TUTTI i ${pocketItems.length} oggetti in mano nella stessa scatola.\n\nScansiona il QR della scatola di destinazione.\n\nVuoi procedere?`
+                            if (pocketItems.length === 1 || confirm(msg)) {
+                                openScanner()
+                            }
+                        }}
                         className="w-full btn bg-amber-500 text-dark-900 font-bold py-4 rounded-2xl shadow-lg shadow-amber-500/30"
                     >
-                        👜 {pocketItems.length} in mano — Posa nella scatola
+                        👜 {pocketItems.length} in mano — Posa {pocketItems.length > 1 ? 'TUTTI ' : ''}nella scatola
                     </button>
                 </div>
             )}
@@ -75,8 +82,8 @@ export function Layout() {
                                 key={item.path}
                                 onClick={() => navigate(item.path)}
                                 className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all ${isActive
-                                        ? 'text-amber-500'
-                                        : 'text-dark-400 hover:text-white'
+                                    ? 'text-amber-500'
+                                    : 'text-dark-400 hover:text-white'
                                     }`}
                             >
                                 <span className="text-xl">{item.icon}</span>

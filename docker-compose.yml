@@ -14,7 +14,9 @@ services:
     restart: unless-stopped
     environment:
       - DATABASE_URL=sqlite:////app/data/magazzino.db
+      # Imposta la tua OpenAI API key qui o come variabile ambiente sul NAS
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
 
-# Note: On Synology, you might need to use 'docker-compose up --build' 
-# or ensure the build context is supported. 
-# If 'build' from URL fails on Synology UI, clone the repo and use 'build: .'
+      # Note: On Synology, you might need to use 'docker-compose up --build' 
+      # or ensure the build context is supported. 
+      # If 'build' from URL fails on Synology UI, clone the repo and use 'build: .'

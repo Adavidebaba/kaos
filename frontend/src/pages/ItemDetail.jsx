@@ -155,12 +155,21 @@ export function ItemDetailPage() {
             <div className="space-y-3">
                 {/* Pick / Flash Move */}
                 <div className="grid grid-cols-2 gap-3">
-                    <button
-                        onClick={handlePocketToggle}
-                        className={inPocket ? 'btn-secondary' : 'btn-primary'}
-                    >
-                        {inPocket ? '❌ Togli dalla tasca' : '✋ Prendi in mano'}
-                    </button>
+                    {inPocket ? (
+                        <button
+                            onClick={handlePocketToggle}
+                            className="btn-secondary"
+                        >
+                            ❌ Rimuovi dalla tasca
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handlePick}
+                            className="btn-primary"
+                        >
+                            ✋ Prendi in mano
+                        </button>
+                    )}
                     <button
                         onClick={openScanner}
                         className="btn-secondary"
@@ -168,6 +177,26 @@ export function ItemDetailPage() {
                         🚀 Sposta
                     </button>
                 </div>
+
+                {/* Quick return to original location (if in pocket and has location) */}
+                {inPocket && item.location_name && (
+                    <button
+                        onClick={async () => {
+                            try {
+                                await itemsApi.update(itemId, { location_id: item.location_id })
+                                removeFromPocket(itemId)
+                                showToast(`📦 Rimesso in: ${item.location_name}`, 'success')
+                                queryClient.invalidateQueries(['item', itemId])
+                                queryClient.invalidateQueries(['items'])
+                            } catch (err) {
+                                showToast(`❌ ${err.message}`, 'error')
+                            }
+                        }}
+                        className="btn bg-green-600 hover:bg-green-500 w-full"
+                    >
+                        📦 Rimetto in: {item.location_name}
+                    </button>
+                )}
 
                 {/* Delete */}
                 <button
