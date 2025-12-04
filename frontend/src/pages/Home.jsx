@@ -36,9 +36,9 @@ export function HomePage() {
 
     // Handler per riporre singolo oggetto
     const handleReponiSingolo = (itemId) => {
-        // Salva itemId temporaneamente e apri scanner
+        // Salva itemId temporaneamente e apri scanner in modo pocket
         sessionStorage.setItem('reponi_single_item', itemId.toString())
-        openScanner()
+        openScanner('pocket')
     }
 
     // Handler per riporre tutti
@@ -47,7 +47,7 @@ export function HomePage() {
             ? '⚠️ Scansiona il QR della scatola dove vuoi posare l\'oggetto.'
             : `⚠️ Stai per posare TUTTI i ${pocketItems.length} oggetti in mano nella stessa scatola.\n\nScansiona il QR della scatola di destinazione.\n\nVuoi procedere?`
         if (pocketItems.length === 1 || confirm(msg)) {
-            openScanner()
+            openScanner('pocket')
         }
     }
 

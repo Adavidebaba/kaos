@@ -16,8 +16,7 @@ import {
 import { useUIStore, usePocketStore } from './store'
 
 function App() {
-    const { isScannerOpen, closeScanner } = useUIStore()
-    const pocketItems = usePocketStore((s) => s.pocketItems)
+    const { isScannerOpen, scannerMode, closeScanner } = useUIStore()
 
     return (
         <>
@@ -36,7 +35,7 @@ function App() {
             {/* Global Scanner Modal */}
             {isScannerOpen && (
                 <ScannerView
-                    mode={pocketItems.length > 0 ? 'pocket' : 'navigate'}
+                    mode={scannerMode}
                     onClose={closeScanner}
                 />
             )}

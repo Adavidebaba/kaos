@@ -52,6 +52,7 @@ export const useUIStore = create((set) => ({
     // Modal states
     isCameraOpen: false,
     isScannerOpen: false,
+    scannerMode: 'navigate', // 'navigate' | 'pocket'
     isSearchOpen: false,
 
     // Current context
@@ -72,8 +73,9 @@ export const useUIStore = create((set) => ({
         isCameraOpen: false
     }),
 
-    openScanner: () => set({ isScannerOpen: true }),
-    closeScanner: () => set({ isScannerOpen: false }),
+    // Scanner con modalità esplicita
+    openScanner: (mode = 'navigate') => set({ isScannerOpen: true, scannerMode: mode }),
+    closeScanner: () => set({ isScannerOpen: false, scannerMode: 'navigate' }),
 
     openSearch: () => set({ isSearchOpen: true }),
     closeSearch: () => set({ isSearchOpen: false }),
