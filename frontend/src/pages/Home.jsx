@@ -4,7 +4,7 @@
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { locationsApi, statsApi, itemsApi } from '../api'
+import { statsApi, itemsApi } from '../api'
 import { useUIStore, usePocketStore } from '../store'
 import { LoadingPage } from '../components/UI'
 
@@ -12,7 +12,7 @@ export function HomePage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const { openScanner, showToast } = useUIStore()
-    const { pocketItems, removeFromPocket, clearPocket } = usePocketStore()
+    const { pocketItems, removeFromPocket } = usePocketStore()
 
     // Fetch stats
     const { data: stats, isLoading } = useQuery({
@@ -20,32 +20,46 @@ export function HomePage() {
         queryFn: statsApi.get
     })
 
-    // Fetch dettagli items in mano (basato su pocketItems IDs)
+    // Fetch dettagli items in mano
     const { data: inHandItems } = useQuery({
         queryKey: ['pocket-items-details', pocketItems],
         queryFn: async () => {
-            // Fetch ogni item per ID
             const items = await Promise.all(
                 pocketItems.map(id => itemsApi.get(id).catch(() => null))
             )
-            // Filtra null (items eliminati o non trovati)
             return items.filter(item => item !== null)
         },
         enabled: pocketItems.length > 0
     })
 
-    // Handler per riporre singolo oggetto
-    const handleReponiSingolo = (itemId) => {
-        // Salva itemId temporaneamente e apri scanner in modo pocket
+    // Riponi in scatola originale (senza scanner)
+    const handleRiponiOriginale = async (item) => {
+        if (!item.location_id) {
+            showToast('❌ Scatola originale non trovata', 'error')
+            return
+        }
+        try {
+            await itemsApi.bulkMove([item.id], item.location_id)
+            removeFromPocket(item.id)
+            showToast(`📦 Riposto in: ${item.location_name}`, 'success')
+            queryClient.invalidateQueries(['pocket-items-details'])
+            queryClient.invalidateQueries(['items'])
+        } catch (err) {
+            showToast(`❌ ${err.message}`, 'error')
+        }
+    }
+
+    // Sposta in nuova scatola (apre scanner)
+    const handleSposta = (itemId) => {
         sessionStorage.setItem('reponi_single_item', itemId.toString())
         openScanner('pocket')
     }
 
-    // Handler per riporre tutti
-    const handleReponiTutti = () => {
+    // Sposta tutti in nuova scatola
+    const handleSpostaTutti = () => {
         const msg = pocketItems.length === 1
-            ? '⚠️ Scansiona il QR della scatola dove vuoi posare l\'oggetto.'
-            : `⚠️ Stai per posare TUTTI i ${pocketItems.length} oggetti in mano nella stessa scatola.\n\nScansiona il QR della scatola di destinazione.\n\nVuoi procedere?`
+            ? 'Scansiona il QR della scatola dove vuoi spostare l\'oggetto.'
+            : `Stai per spostare TUTTI i ${pocketItems.length} oggetti nella stessa scatola.\n\nScansiona il QR della scatola di destinazione.`
         if (pocketItems.length === 1 || confirm(msg)) {
             openScanner('pocket')
         }
@@ -128,61 +142,65 @@ export function HomePage() {
                     {/* Lista oggetti in mano */}
                     <div className="space-y-2 mb-4">
                         {inHandItems && inHandItems.length > 0 ? (
-                            // Items caricati correttamente
                             inHandItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="card p-3 flex items-center gap-3"
+                                    className="card p-3 flex items-center gap-2"
                                 >
                                     <img
                                         src={`/${item.thumbnail_path}`}
                                         alt=""
-                                        className="w-12 h-12 rounded-lg object-cover bg-dark-700"
+                                        className="w-12 h-12 rounded-lg object-cover bg-dark-700 cursor-pointer"
                                         onClick={() => navigate(`/item/${item.id}`)}
                                     />
-                                    <div className="flex-1 min-w-0" onClick={() => navigate(`/item/${item.id}`)}>
+                                    <div
+                                        className="flex-1 min-w-0 cursor-pointer"
+                                        onClick={() => navigate(`/item/${item.id}`)}
+                                    >
                                         <p className="text-white text-sm truncate">
                                             {item.description || 'Senza descrizione'}
                                         </p>
                                     </div>
+                                    {/* Riponi nella scatola originale */}
                                     <button
-                                        onClick={() => handleReponiSingolo(item.id)}
-                                        className="btn-secondary text-xs px-3 py-2"
+                                        onClick={() => handleRiponiOriginale(item)}
+                                        className="btn text-[11px] px-2 py-1.5 bg-green-600 hover:bg-green-500 text-white"
+                                        title={`Riponi in ${item.location_name}`}
                                     >
-                                        Riponi
+                                        📦 {item.location_name?.substring(0, 10) || '?'}
+                                    </button>
+                                    {/* Sposta in altra scatola */}
+                                    <button
+                                        onClick={() => handleSposta(item.id)}
+                                        className="btn-secondary text-[11px] px-2 py-1.5"
+                                    >
+                                        🚀
                                     </button>
                                 </div>
                             ))
                         ) : (
-                            // Fallback: skeleton mentre carica
                             pocketItems.map((itemId) => (
                                 <div key={itemId} className="card p-3 flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-lg bg-dark-700 animate-pulse" />
                                     <div className="flex-1">
                                         <div className="h-4 bg-dark-700 rounded animate-pulse" />
                                     </div>
-                                    <button
-                                        onClick={() => handleReponiSingolo(itemId)}
-                                        className="btn-secondary text-xs px-3 py-2"
-                                    >
-                                        Riponi
-                                    </button>
                                 </div>
                             ))
                         )}
                     </div>
 
-                    {/* Pulsante posa tutti */}
+                    {/* Pulsante sposta tutti */}
                     <button
-                        onClick={handleReponiTutti}
+                        onClick={handleSpostaTutti}
                         className="w-full btn bg-amber-500 text-dark-900 font-bold py-4 rounded-2xl"
                     >
-                        👜 {pocketItems.length} in mano — Posa {pocketItems.length > 1 ? 'TUTTI ' : ''}nella scatola
+                        🚀 Sposta {pocketItems.length > 1 ? 'TUTTI ' : ''}in nuova scatola
                     </button>
                 </section>
             )}
 
-            {/* Empty state se niente selezionato */}
+            {/* Empty state */}
             {pocketItems.length === 0 && (
                 <section className="text-center py-8 text-dark-500">
                     <p className="text-4xl mb-2">👋</p>

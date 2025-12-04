@@ -1,18 +1,69 @@
 /**
  * ItemCard - Card per visualizzazione item in griglia
+ * 
+ * Props:
+ * - item: oggetto item
+ * - onClick: callback click (navigazione)
+ * - showLocation: mostra nome scatola
+ * - showActions: mostra pulsanti Prendi/Riponi/Sposta (default true)
+ * - onSposta: callback per Sposta (apre scanner)
  */
-import { usePocketStore } from '../../store'
+import { usePocketStore, useUIStore } from '../../store'
+import { itemsApi } from '../../api'
+import { useQueryClient } from '@tanstack/react-query'
 
-export function ItemCard({ item, onClick, showLocation = false }) {
+export function ItemCard({
+    item,
+    onClick,
+    showLocation = false,
+    showActions = true,
+    onSposta
+}) {
+    const queryClient = useQueryClient()
     const { isInPocket, addToPocket, removeFromPocket } = usePocketStore()
+    const { showToast, openScanner } = useUIStore()
     const inPocket = isInPocket(item.id)
 
-    const handlePocketToggle = (e) => {
+    // Prendi in mano
+    const handlePrendi = async (e) => {
         e.stopPropagation()
-        if (inPocket) {
-            removeFromPocket(item.id)
-        } else {
+        try {
+            await itemsApi.pick(item.id)
             addToPocket(item.id)
+            showToast('✋ Preso in mano!', 'success')
+            queryClient.invalidateQueries(['items'])
+        } catch (err) {
+            showToast(`❌ ${err.message}`, 'error')
+        }
+    }
+
+    // Riponi nella scatola originale (senza scanner)
+    const handleRiponi = async (e) => {
+        e.stopPropagation()
+        if (!item.location_id) {
+            showToast('❌ Scatola originale non trovata', 'error')
+            return
+        }
+        try {
+            await itemsApi.bulkMove([item.id], item.location_id)
+            removeFromPocket(item.id)
+            showToast(`📦 Riposto in: ${item.location_name}`, 'success')
+            queryClient.invalidateQueries(['items'])
+            queryClient.invalidateQueries(['pocket-items-details'])
+        } catch (err) {
+            showToast(`❌ ${err.message}`, 'error')
+        }
+    }
+
+    // Sposta in nuova scatola (apre scanner)
+    const handleSposta = (e) => {
+        e.stopPropagation()
+        // Salva item da spostare e apri scanner
+        sessionStorage.setItem('reponi_single_item', item.id.toString())
+        if (onSposta) {
+            onSposta(item)
+        } else {
+            openScanner('pocket')
         }
     }
 
@@ -24,6 +75,11 @@ export function ItemCard({ item, onClick, showLocation = false }) {
     }
 
     const badge = statusBadge[item.status] || statusBadge.available
+
+    // Abbrevia nome scatola per pulsante
+    const shortLocationName = item.location_name
+        ? (item.location_name.length > 12 ? item.location_name.substring(0, 12) + '…' : item.location_name)
+        : '?'
 
     return (
         <div
@@ -57,19 +113,43 @@ export function ItemCard({ item, onClick, showLocation = false }) {
                 <span className={badge.class}>{badge.label}</span>
             </div>
 
-            {/* Pocket Toggle */}
-            <button
-                onClick={handlePocketToggle}
-                className={`absolute top-2 right-2 px-2 py-1 rounded-lg 
-                   text-xs font-medium
-                   transition-all active:scale-90
-                   ${inPocket
-                        ? 'bg-amber-500 text-dark-900'
-                        : 'bg-dark-800/80 text-white'
-                    }`}
-            >
-                {inPocket ? 'Riponi' : 'Prendi'}
-            </button>
+            {/* Action Buttons */}
+            {showActions && (
+                <div className="absolute top-2 right-2 flex gap-1">
+                    {inPocket ? (
+                        <>
+                            {/* Riponi nella scatola originale */}
+                            <button
+                                onClick={handleRiponi}
+                                className="px-2 py-1 rounded-lg text-[10px] font-medium
+                                           bg-green-600 text-white
+                                           transition-all active:scale-90"
+                                title={`Riponi in ${item.location_name}`}
+                            >
+                                📦 {shortLocationName}
+                            </button>
+                            {/* Sposta in altra scatola */}
+                            <button
+                                onClick={handleSposta}
+                                className="px-2 py-1 rounded-lg text-[10px] font-medium
+                                           bg-dark-800/80 text-white
+                                           transition-all active:scale-90"
+                            >
+                                🚀
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={handlePrendi}
+                            className="px-2 py-1 rounded-lg text-xs font-medium
+                                       bg-dark-800/80 text-white
+                                       transition-all active:scale-90"
+                        >
+                            Prendi
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     )
 }

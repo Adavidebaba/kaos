@@ -45,9 +45,27 @@ export function ItemDetailPage() {
         }
     }
 
-    // Riponi (apre scanner per scegliere scatola)
-    const handleRiponi = () => {
-        openScanner()
+    // Riponi nella scatola originale (senza scanner)
+    const handleRiponiOriginale = async () => {
+        if (!item?.location_id) {
+            showToast('❌ Scatola originale non trovata', 'error')
+            return
+        }
+        try {
+            await itemsApi.bulkMove([itemId], item.location_id)
+            removeFromPocket(itemId)
+            showToast(`📦 Riposto in: ${item.location_name}`, 'success')
+            queryClient.invalidateQueries(['item', itemId])
+            queryClient.invalidateQueries(['items'])
+        } catch (err) {
+            showToast(`❌ ${err.message}`, 'error')
+        }
+    }
+
+    // Sposta in nuova scatola (apre scanner)
+    const handleSposta = () => {
+        sessionStorage.setItem('reponi_single_item', itemId.toString())
+        openScanner('pocket')
     }
 
     // Avvia modifica descrizione
@@ -124,28 +142,32 @@ export function ItemDetailPage() {
             </button>
 
             {/* Quick Actions - Sopra la foto */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex gap-2">
                 {inPocket ? (
-                    <button
-                        onClick={handleRiponi}
-                        className="btn bg-amber-500 text-dark-900 font-bold"
-                    >
-                        📦 Riponi
-                    </button>
+                    <>
+                        {/* Riponi nella scatola originale */}
+                        <button
+                            onClick={handleRiponiOriginale}
+                            className="btn flex-1 bg-green-600 hover:bg-green-500 text-white font-bold"
+                        >
+                            📦 {item.location_name || 'Scatola'}
+                        </button>
+                        {/* Sposta in altra scatola */}
+                        <button
+                            onClick={handleSposta}
+                            className="btn-secondary px-4"
+                        >
+                            🚀
+                        </button>
+                    </>
                 ) : (
                     <button
                         onClick={handlePick}
-                        className="btn-primary"
+                        className="btn-primary flex-1"
                     >
                         ✋ Prendi
                     </button>
                 )}
-                <button
-                    onClick={() => openScanner('navigate')}
-                    className="btn-secondary"
-                >
-                    🚀 Sposta
-                </button>
             </div>
 
             {/* Image */}

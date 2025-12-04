@@ -78,6 +78,7 @@ export function SearchPage() {
                                     item={item}
                                     onClick={handleItemClick}
                                     showLocation
+                                    showActions={false}
                                 />
                             ))}
                         </div>
