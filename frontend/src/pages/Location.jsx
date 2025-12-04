@@ -41,11 +41,8 @@ export function LocationPage() {
     })
 
     // Verifica se è un errore 404 (location non esiste)
-    const isNotFoundError = error && (
-        error.message.includes('404') ||
-        error.message.toLowerCase().includes('non trovata') ||
-        error.message.toLowerCase().includes('not found')
-    )
+    // Se c'è un errore, assumiamo sia perché la location non esiste
+    const isNotFoundError = !!error
 
     // Claim (crea) nuova location
     const handleClaim = async () => {
