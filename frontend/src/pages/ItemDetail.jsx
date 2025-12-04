@@ -1,12 +1,13 @@
 /**
  * ItemDetailPage - Dettaglio singolo oggetto
- * Con modifica descrizione e terminologia Prendi/Riponi
+ * Con modifica descrizione, terminologia Prendi/Riponi, e Ali search
  */
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { itemsApi } from '../api'
 import { useUIStore, usePocketStore } from '../store'
+import { useShare } from '../hooks'
 import { LoadingPage, EmptyState } from '../components/UI'
 
 export function ItemDetailPage() {
@@ -15,6 +16,7 @@ export function ItemDetailPage() {
     const queryClient = useQueryClient()
     const { showToast, openScanner } = useUIStore()
     const { isInPocket, addToPocket, removeFromPocket } = usePocketStore()
+    const { shareForSearch, isSharing, isShareSupported } = useShare()
 
     const itemId = parseInt(id, 10)
     const inPocket = isInPocket(itemId)
@@ -148,14 +150,36 @@ export function ItemDetailPage() {
 
                     {isEditing ? (
                         <div className="space-y-2">
-                            <input
-                                type="text"
-                                value={editDescription}
-                                onChange={(e) => setEditDescription(e.target.value)}
-                                placeholder="Inserisci descrizione..."
-                                className="input w-full"
-                                autoFocus
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={editDescription}
+                                    onChange={(e) => setEditDescription(e.target.value)}
+                                    placeholder="Inserisci descrizione..."
+                                    className="input w-full pr-20"
+                                    autoFocus
+                                />
+                                {isShareSupported() && (
+                                    <button
+                                        onClick={async () => {
+                                            // Scarica immagine e condividi per ricerca
+                                            try {
+                                                const response = await fetch(`/${item.photo_path}`)
+                                                const blob = await response.blob()
+                                                await shareForSearch(blob)
+                                            } catch (err) {
+                                                showToast(`❌ ${err.message}`, 'error')
+                                            }
+                                        }}
+                                        disabled={isSharing}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 
+                                                   px-3 py-1.5 rounded-lg bg-amber-500 text-dark-900 
+                                                   text-sm font-bold disabled:opacity-50"
+                                    >
+                                        {isSharing ? '...' : '🚀 Ali'}
+                                    </button>
+                                )}
+                            </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setIsEditing(false)}
