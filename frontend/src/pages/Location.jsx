@@ -1,9 +1,9 @@
 /**
  * LocationPage - Vista singola scatola con items
- * Gestisce Deep Linking da QR Code
+ * Gestisce Deep Linking da QR Code e parametro ?camera=true
  */
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { locationsApi, itemsApi } from '../api'
 import { useUIStore } from '../store'
@@ -13,8 +13,12 @@ import { ItemCard, LoadingPage, EmptyState } from '../components/UI'
 export function LocationPage() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
     const queryClient = useQueryClient()
     const { showToast } = useUIStore()
+
+    // Leggi parametro camera=true dall'URL
+    const shouldOpenCamera = searchParams.get('camera') === 'true'
 
     const [showCamera, setShowCamera] = useState(false)
     const [claimName, setClaimName] = useState('')
@@ -40,8 +44,16 @@ export function LocationPage() {
         enabled: !!location
     })
 
+    // Apri camera automaticamente se viene da ?camera=true
+    useEffect(() => {
+        if (shouldOpenCamera && location && !showCamera) {
+            setShowCamera(true)
+            // Rimuovi il parametro camera dall'URL per evitare loop
+            navigate(`/loc/${locationId}`, { replace: true })
+        }
+    }, [shouldOpenCamera, location, showCamera, navigate, locationId])
+
     // Verifica se è un errore 404 (location non esiste)
-    // Se c'è un errore, assumiamo sia perché la location non esiste
     const isNotFoundError = !!error
 
     // Claim (crea) nuova location
@@ -72,6 +84,13 @@ export function LocationPage() {
         queryClient.invalidateQueries(['items', { locationId }])
         queryClient.invalidateQueries(['locations'])
         queryClient.invalidateQueries(['stats'])
+    }
+
+    // Chiudi camera
+    const handleCloseCamera = () => {
+        setShowCamera(false)
+        // Assicurati di essere sulla pagina corretta senza ?camera=true
+        navigate(`/loc/${locationId}`, { replace: true })
     }
 
     // Click su item
@@ -132,7 +151,7 @@ export function LocationPage() {
             <CameraView
                 locationId={location.id}
                 locationName={location.name}
-                onClose={() => setShowCamera(false)}
+                onClose={handleCloseCamera}
                 onSave={handleItemSaved}
             />
         )
@@ -157,6 +176,14 @@ export function LocationPage() {
 
     return (
         <div className="p-4 space-y-4">
+            {/* Back button */}
+            <button
+                onClick={() => navigate('/')}
+                className="btn-ghost px-2"
+            >
+                ← Home
+            </button>
+
             {/* Header Location */}
             <div className="card p-4">
                 <div className="flex items-center gap-3">
