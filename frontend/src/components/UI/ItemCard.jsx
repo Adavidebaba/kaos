@@ -60,15 +60,15 @@ export function ItemCard({ item, onClick, showLocation = false }) {
             {/* Pocket Toggle */}
             <button
                 onClick={handlePocketToggle}
-                className={`absolute top-2 right-2 w-8 h-8 rounded-full 
-                   flex items-center justify-center text-lg
+                className={`absolute top-2 right-2 px-2 py-1 rounded-lg 
+                   text-xs font-medium
                    transition-all active:scale-90
                    ${inPocket
                         ? 'bg-amber-500 text-dark-900'
                         : 'bg-dark-800/80 text-white'
                     }`}
             >
-                {inPocket ? '👜' : '✋'}
+                {inPocket ? 'Riponi' : 'Prendi'}
             </button>
         </div>
     )

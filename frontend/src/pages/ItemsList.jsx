@@ -5,11 +5,9 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { itemsApi } from '../api'
 import { ItemCard, LoadingPage, EmptyState } from '../components/UI'
-import { usePocketStore } from '../store'
 
 export function ItemsListPage() {
     const navigate = useNavigate()
-    const { isInPocket, addToPocket, removeFromPocket } = usePocketStore()
 
     // Fetch all items
     const { data, isLoading } = useQuery({
@@ -21,15 +19,6 @@ export function ItemsListPage() {
 
     const handleItemClick = (item) => {
         navigate(`/item/${item.id}`)
-    }
-
-    const handleTogglePocket = (item, e) => {
-        e.stopPropagation()
-        if (isInPocket(item.id)) {
-            removeFromPocket(item.id)
-        } else {
-            addToPocket(item.id)
-        }
     }
 
     if (isLoading) {
@@ -54,24 +43,13 @@ export function ItemsListPage() {
 
             {/* Lista */}
             {items.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="item-grid">
                     {items.map((item) => (
-                        <div key={item.id} className="relative">
-                            <ItemCard
-                                item={item}
-                                onClick={handleItemClick}
-                            />
-                            {/* Pulsante Prendi/Riponi */}
-                            <button
-                                onClick={(e) => handleTogglePocket(item, e)}
-                                className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-lg ${isInPocket(item.id)
-                                        ? 'bg-amber-500 text-dark-900'
-                                        : 'bg-dark-800/80 text-white'
-                                    }`}
-                            >
-                                {isInPocket(item.id) ? 'Riponi' : 'Prendi'}
-                            </button>
-                        </div>
+                        <ItemCard
+                            key={item.id}
+                            item={item}
+                            onClick={handleItemClick}
+                        />
                     ))}
                 </div>
             ) : (
