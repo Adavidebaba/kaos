@@ -56,3 +56,9 @@
 <testing_safety>
 - Prima di eseguire test automatici, crea un backup dei file database presenti (ad esempio `data/easyroom.db*`) e ripristinali immediatamente dopo l'esecuzione per non perdere i dati configurati dall'utente.
 </testing_safety>
+
+<deployment_rules>
+- **Docker Deployment**: Always configure `docker-compose.yml` to build directly from the private GitHub repository using the `GITHUB_PAT` environment variable.
+  - Format: `build: https://Username:${GITHUB_PAT}@github.com/Username/repo.git`
+  - This ensures compatibility with Synology Container Manager without manual file copying.
+</deployment_rules>

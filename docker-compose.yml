@@ -4,12 +4,13 @@ services:
   kaos:
     container_name: kaos
     # Build from local context
-    build: .
-    # build: https://github.com/Adavidebaba/kaos.git
+    # build: .
+    # Build from GitHub with PAT for private repo access
+    build: https://Adavidebaba:${GITHUB_PAT}@github.com/Adavidebaba/kaos.git
     ports:
       - "8222:8222"
     volumes:
-      - ./data:/app/data
+      - /volume1/docker/kaos/data:/app/data
     restart: unless-stopped
     environment:
       - DATABASE_URL=sqlite:////app/data/magazzino.db

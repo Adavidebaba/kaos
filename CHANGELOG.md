@@ -1,5 +1,7 @@
 # Changelog
 
+## [Unreleased]
+- **Docker**: Updated `docker-compose.yml` to build directly from GitHub repository to resolve "missing Dockerfile" error on Synology NAS.
 ## [0.1.0] - 2025-12-02
 ### Added
 - **Infrastructure**:
