@@ -1,29 +1,13 @@
 /**
  * Layout - Componente layout principale Mobile First
+ * Versione semplificata senza barra navigazione inferiore
  */
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { usePocketStore, useUIStore } from '../../store'
-
-// Icons (emoji per semplicità, sostituibili con lucide-react)
-const icons = {
-    home: '🏠',
-    search: '🔍',
-    scan: '📷',
-    tools: '🔧',
-    pocket: '👜'
-}
+import { Outlet, useNavigate } from 'react-router-dom'
+import { useUIStore } from '../../store'
 
 export function Layout() {
     const navigate = useNavigate()
-    const location = useLocation()
-    const pocketItems = usePocketStore((s) => s.pocketItems)
-    const { toast, openScanner } = useUIStore()
-
-    const navItems = [
-        { path: '/', icon: icons.home, label: 'Home' },
-        { path: '/search', icon: icons.search, label: 'Cerca' },
-        { path: '/tools', icon: icons.tools, label: 'Tools' }
-    ]
+    const { toast } = useUIStore()
 
     return (
         <div className="min-h-screen flex flex-col bg-dark-900">
@@ -37,43 +21,21 @@ export function Layout() {
                         🗃️ Caos Ordinato
                     </h1>
 
-                    {/* Quick Scan Button */}
+                    {/* Tools Button */}
                     <button
-                        onClick={openScanner}
+                        onClick={() => navigate('/tools')}
                         className="btn-icon"
-                        title="Scansiona QR"
+                        title="Strumenti"
                     >
-                        📷
+                        🔧
                     </button>
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto pb-20">
+            {/* Main Content - no bottom padding needed anymore */}
+            <main className="flex-1 overflow-y-auto pb-4">
                 <Outlet />
             </main>
-
-            {/* Bottom Navigation */}
-            <nav className="safe-bottom fixed bottom-0 inset-x-0 z-30 bg-dark-800/95 backdrop-blur-sm border-t border-dark-700">
-                <div className="flex justify-around items-center py-2">
-                    {navItems.map((item) => {
-                        const isActive = location.pathname === item.path
-                        return (
-                            <button
-                                key={item.path}
-                                onClick={() => navigate(item.path)}
-                                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all ${isActive
-                                    ? 'text-amber-500'
-                                    : 'text-dark-400 hover:text-white'
-                                    }`}
-                            >
-                                <span className="text-xl">{item.icon}</span>
-                                <span className="text-[10px] font-medium">{item.label}</span>
-                            </button>
-                        )
-                    })}
-                </div>
-            </nav>
 
             {/* Toast Notification */}
             {toast && (
