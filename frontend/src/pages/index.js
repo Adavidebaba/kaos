@@ -1,5 +1,7 @@
 export { HomePage } from './Home'
 export { LocationPage } from './Location'
+export { LocationsListPage } from './LocationsList'
+export { ItemsListPage } from './ItemsList'
 export { SearchPage } from './Search'
 export { ToolsPage } from './Tools'
 export { ItemDetailPage } from './ItemDetail'

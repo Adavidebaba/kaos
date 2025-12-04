@@ -1,6 +1,8 @@
 /**
  * ItemDetailPage - Dettaglio singolo oggetto
+ * Con modifica descrizione e terminologia Prendi/Riponi
  */
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { itemsApi } from '../api'
@@ -17,6 +19,11 @@ export function ItemDetailPage() {
     const itemId = parseInt(id, 10)
     const inPocket = isInPocket(itemId)
 
+    // State per modifica descrizione
+    const [isEditing, setIsEditing] = useState(false)
+    const [editDescription, setEditDescription] = useState('')
+    const [isSaving, setIsSaving] = useState(false)
+
     // Fetch item
     const { data: item, isLoading, error } = useQuery({
         queryKey: ['item', itemId],
@@ -28,7 +35,7 @@ export function ItemDetailPage() {
         try {
             await itemsApi.pick(itemId)
             addToPocket(itemId)
-            showToast('✋ Oggetto in mano!', 'success')
+            showToast('✋ Preso in mano!', 'success')
             queryClient.invalidateQueries(['item', itemId])
             queryClient.invalidateQueries(['items'])
         } catch (err) {
@@ -36,14 +43,30 @@ export function ItemDetailPage() {
         }
     }
 
-    // Toggle pocket (per rimuovere)
-    const handlePocketToggle = () => {
-        if (inPocket) {
-            removeFromPocket(itemId)
-            showToast('Rimosso dalla tasca', 'info')
-        } else {
-            addToPocket(itemId)
-            showToast('✋ Aggiunto alla tasca', 'success')
+    // Riponi (apre scanner per scegliere scatola)
+    const handleRiponi = () => {
+        openScanner()
+    }
+
+    // Avvia modifica descrizione
+    const handleStartEdit = () => {
+        setEditDescription(item?.description || '')
+        setIsEditing(true)
+    }
+
+    // Salva descrizione
+    const handleSaveDescription = async () => {
+        setIsSaving(true)
+        try {
+            await itemsApi.update(itemId, { description: editDescription || null })
+            showToast('✅ Descrizione salvata!', 'success')
+            queryClient.invalidateQueries(['item', itemId])
+            queryClient.invalidateQueries(['items'])
+            setIsEditing(false)
+        } catch (err) {
+            showToast(`❌ ${err.message}`, 'error')
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -109,12 +132,52 @@ export function ItemDetailPage() {
 
             {/* Info */}
             <div className="card p-4 space-y-3">
-                {/* Description */}
+                {/* Description - Editable */}
                 <div>
-                    <h3 className="text-dark-500 text-xs uppercase mb-1">Descrizione</h3>
-                    <p className="text-white text-lg">
-                        {item.description || <span className="text-dark-500 italic">Nessuna descrizione</span>}
-                    </p>
+                    <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-dark-500 text-xs uppercase">Descrizione</h3>
+                        {!isEditing && (
+                            <button
+                                onClick={handleStartEdit}
+                                className="text-amber-500 text-xs hover:underline"
+                            >
+                                ✏️ Modifica
+                            </button>
+                        )}
+                    </div>
+
+                    {isEditing ? (
+                        <div className="space-y-2">
+                            <input
+                                type="text"
+                                value={editDescription}
+                                onChange={(e) => setEditDescription(e.target.value)}
+                                placeholder="Inserisci descrizione..."
+                                className="input w-full"
+                                autoFocus
+                            />
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setIsEditing(false)}
+                                    className="btn-secondary flex-1"
+                                    disabled={isSaving}
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    onClick={handleSaveDescription}
+                                    className="btn-primary flex-1"
+                                    disabled={isSaving}
+                                >
+                                    {isSaving ? '⏳' : '💾'} Salva
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-white text-lg">
+                            {item.description || <span className="text-dark-500 italic">Nessuna descrizione</span>}
+                        </p>
+                    )}
                 </div>
 
                 {/* Location */}
@@ -153,21 +216,21 @@ export function ItemDetailPage() {
 
             {/* Actions */}
             <div className="space-y-3">
-                {/* Pick / Flash Move */}
+                {/* Prendi / Riponi */}
                 <div className="grid grid-cols-2 gap-3">
                     {inPocket ? (
                         <button
-                            onClick={handlePocketToggle}
-                            className="btn-secondary"
+                            onClick={handleRiponi}
+                            className="btn bg-amber-500 text-dark-900 font-bold"
                         >
-                            ❌ Rimuovi dalla tasca
+                            📦 Riponi
                         </button>
                     ) : (
                         <button
                             onClick={handlePick}
                             className="btn-primary"
                         >
-                            ✋ Prendi in mano
+                            ✋ Prendi
                         </button>
                     )}
                     <button

@@ -7,6 +7,8 @@ import { ScannerView } from './components/Scanner'
 import {
     HomePage,
     LocationPage,
+    LocationsListPage,
+    ItemsListPage,
     SearchPage,
     ToolsPage,
     ItemDetailPage
@@ -23,6 +25,8 @@ function App() {
                 <Route path="/" element={<Layout />}>
                     <Route index element={<HomePage />} />
                     <Route path="loc/:id" element={<LocationPage />} />
+                    <Route path="locations" element={<LocationsListPage />} />
+                    <Route path="items" element={<ItemsListPage />} />
                     <Route path="item/:id" element={<ItemDetailPage />} />
                     <Route path="search" element={<SearchPage />} />
                     <Route path="tools" element={<ToolsPage />} />
