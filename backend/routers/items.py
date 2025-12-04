@@ -178,7 +178,10 @@ def create_item(
     """
     Crea un nuovo item.
     Chiamato dopo upload immagine.
+    Genera automaticamente embedding per ricerca semantica.
     """
+    from ..services import embeddings
+    
     # Verifica location
     location = db.query(Location).filter(
         Location.id == data.location_id,
@@ -191,11 +194,19 @@ def create_item(
             detail="Location non valida"
         )
     
+    # Genera embedding se descrizione presente
+    embedding_json = None
+    if data.description and embeddings.is_semantic_search_available():
+        embedding = embeddings.generate_embedding(data.description)
+        if embedding:
+            embedding_json = embeddings.embedding_to_json(embedding)
+    
     item = Item(
         location_id=data.location_id,
         photo_path=data.photo_path,
         thumbnail_path=data.thumbnail_path,
         description=data.description,
+        embedding=embedding_json,
         status=ItemStatus.AVAILABLE
     )
     

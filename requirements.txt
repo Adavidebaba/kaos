@@ -5,3 +5,5 @@ pydantic
 python-multipart
 Pillow
 aiofiles
+openai>=1.0.0
+numpy

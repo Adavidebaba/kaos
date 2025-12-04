@@ -81,6 +81,7 @@ class Item(Base):
     photo_path = Column(String(255), nullable=False)
     thumbnail_path = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
+    embedding = Column(Text, nullable=True)  # JSON array per ricerca semantica
     status = Column(
         Enum(ItemStatus), 
         default=ItemStatus.AVAILABLE,

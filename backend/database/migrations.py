@@ -39,6 +39,18 @@ def _run_migrations():
                 "ALTER TABLE locations ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
             ))
             conn.commit()
+        
+        # Migrazione: aggiungi embedding a items se non esiste
+        result = conn.execute(text(
+            "PRAGMA table_info(items)"
+        ))
+        item_columns = [row[1] for row in result.fetchall()]
+        
+        if 'embedding' not in item_columns:
+            conn.execute(text(
+                "ALTER TABLE items ADD COLUMN embedding TEXT"
+            ))
+            conn.commit()
 
 
 def _setup_fts5():

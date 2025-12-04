@@ -29,6 +29,9 @@ class Settings:
     # API
     API_PREFIX: str = "/api"
     
+    # OpenAI (per ricerca semantica)
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    
     # App Info
     APP_NAME: str = "Magazzino Caos Ordinato"
     APP_VERSION: str = "1.0.0"
