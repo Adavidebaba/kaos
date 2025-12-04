@@ -127,46 +127,49 @@ export function HomePage() {
 
                     {/* Lista oggetti in mano */}
                     <div className="space-y-2 mb-4">
-                        {inHandItems?.map((item) => (
-                            <div
-                                key={item.id}
-                                className="card p-3 flex items-center gap-3"
-                            >
-                                <img
-                                    src={`/${item.thumbnail_path}`}
-                                    alt=""
-                                    className="w-12 h-12 rounded-lg object-cover bg-dark-700"
-                                    onClick={() => navigate(`/item/${item.id}`)}
-                                />
-                                <div className="flex-1 min-w-0" onClick={() => navigate(`/item/${item.id}`)}>
-                                    <p className="text-white text-sm truncate">
-                                        {item.description || 'Senza descrizione'}
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={() => handleReponiSingolo(item.id)}
-                                    className="btn-secondary text-xs px-3 py-2"
+                        {inHandItems && inHandItems.length > 0 ? (
+                            // Items caricati correttamente
+                            inHandItems.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="card p-3 flex items-center gap-3"
                                 >
-                                    Riponi
-                                </button>
-                            </div>
-                        )) || (
-                                // Fallback se items non ancora caricati
-                                pocketItems.map((itemId) => (
-                                    <div key={itemId} className="card p-3 flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-lg bg-dark-700 animate-pulse" />
-                                        <div className="flex-1">
-                                            <div className="h-4 bg-dark-700 rounded animate-pulse" />
-                                        </div>
-                                        <button
-                                            onClick={() => handleReponiSingolo(itemId)}
-                                            className="btn-secondary text-xs px-3 py-2"
-                                        >
-                                            Riponi
-                                        </button>
+                                    <img
+                                        src={`/${item.thumbnail_path}`}
+                                        alt=""
+                                        className="w-12 h-12 rounded-lg object-cover bg-dark-700"
+                                        onClick={() => navigate(`/item/${item.id}`)}
+                                    />
+                                    <div className="flex-1 min-w-0" onClick={() => navigate(`/item/${item.id}`)}>
+                                        <p className="text-white text-sm truncate">
+                                            {item.description || 'Senza descrizione'}
+                                        </p>
                                     </div>
-                                ))
-                            )}
+                                    <button
+                                        onClick={() => handleReponiSingolo(item.id)}
+                                        className="btn-secondary text-xs px-3 py-2"
+                                    >
+                                        Riponi
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            // Fallback: skeleton mentre carica
+                            pocketItems.map((itemId) => (
+                                <div key={itemId} className="card p-3 flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-lg bg-dark-700 animate-pulse" />
+                                    <div className="flex-1">
+                                        <div className="h-4 bg-dark-700 rounded animate-pulse" />
+                                    </div>
+                                    <button
+                                        onClick={() => handleReponiSingolo(itemId)}
+                                        className="btn-secondary text-xs px-3 py-2"
+                                    >
+                                        Riponi
+                                    </button>
+                                </div>
+                            ))
+                        )}
                     </div>
 
                     {/* Pulsante posa tutti */}
