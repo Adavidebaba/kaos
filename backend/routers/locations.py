@@ -172,6 +172,8 @@ def claim_location(
     Usato per "claiming" di scatole via QR code.
     Se l'ID esiste già, ritorna la location esistente.
     """
+    from sqlalchemy import text
+    
     existing = db.query(Location).filter(Location.id == location_id).first()
     
     if existing:
@@ -192,18 +194,32 @@ def claim_location(
             created_at=existing.created_at
         )
     
-    # Crea nuova location con ID specifico
-    # Nota: in SQLite, INSERT con id esplicito funziona
-    location = Location(
-        id=location_id,
-        name=data.name,
-        description=data.description,
-        parent_id=data.parent_id
-    )
+    # Crea nuova location con ID specifico usando SQL raw
+    # SQLite permette INSERT con ID esplicito
+    try:
+        db.execute(
+            text("""
+                INSERT INTO locations (id, name, description, parent_id, created_at)
+                VALUES (:id, :name, :description, :parent_id, :created_at)
+            """),
+            {
+                "id": location_id,
+                "name": data.name,
+                "description": data.description,
+                "parent_id": data.parent_id,
+                "created_at": datetime.utcnow()
+            }
+        )
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Errore creazione location: {str(e)}"
+        )
     
-    db.add(location)
-    db.commit()
-    db.refresh(location)
+    # Recupera la location appena creata
+    location = db.query(Location).filter(Location.id == location_id).first()
     
     return LocationResponse(
         id=location.id,
