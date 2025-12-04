@@ -1,21 +1,43 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
-import LocationView from './pages/LocationView';
-import Tools from './pages/Tools';
-
-import SearchPage from './pages/SearchPage';
+/**
+ * App - Root component con routing
+ */
+import { Routes, Route } from 'react-router-dom'
+import { Layout } from './components/Layout'
+import { ScannerView } from './components/Scanner'
+import {
+    HomePage,
+    LocationPage,
+    SearchPage,
+    ToolsPage,
+    ItemDetailPage
+} from './pages'
+import { useUIStore, usePocketStore } from './store'
 
 function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/search" element={<SearchPage />} />
-      <Route path="/tools" element={<Tools />} />
-      <Route path="/loc/:id" element={<LocationView />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
+    const { isScannerOpen, closeScanner } = useUIStore()
+    const pocketItems = usePocketStore((s) => s.pocketItems)
+
+    return (
+        <>
+            <Routes>
+                <Route path="/" element={<Layout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path="loc/:id" element={<LocationPage />} />
+                    <Route path="item/:id" element={<ItemDetailPage />} />
+                    <Route path="search" element={<SearchPage />} />
+                    <Route path="tools" element={<ToolsPage />} />
+                </Route>
+            </Routes>
+
+            {/* Global Scanner Modal */}
+            {isScannerOpen && (
+                <ScannerView
+                    mode={pocketItems.length > 0 ? 'pocket' : 'navigate'}
+                    onClose={closeScanner}
+                />
+            )}
+        </>
+    )
 }
 
-export default App;
+export default App

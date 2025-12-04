@@ -1,61 +1,40 @@
 # Changelog
 
-## [Unreleased]
-- **Docker**: Updated `docker-compose.yml` to build directly from GitHub repository to resolve "missing Dockerfile" error on Synology NAS.
-## [0.1.0] - 2025-12-02
-### Added
-- **Infrastructure**:
-    - Created `backend` (FastAPI) and `frontend` (React/Vite) directories.
-    - Configured `docker-compose.yml` for local development.
-    - Configured `Dockerfile` for multi-stage build.
-- **Backend**:
-    - Implemented SQLite database with WAL mode.
-    - Created `Location` and `Item` models.
-    - Implemented `locations` and `items` API routes.
-    - Added image processing (Resize + Thumbnail + EXIF Rotation).
-- **Frontend**:
-    - Initialized React app with Tailwind CSS.
-    - Created `Camera` component with:
-        - Environment camera support.
-        - HUD Overlay.
-        - "Ali-Hack" (Native Share) implementation.
-    - Created `App` layout with "Speed-First" design.
-    - Implemented "Optimistic Save" logic for items.
+Tutte le modifiche significative al progetto Magazzino "Caos Ordinato".
 
-### [0.2.0] - 2025-12-02
-### Added
-- **Routing & Deep Linking**:
-    - Implemented `react-router-dom` with routes: `/`, `/tools`, `/loc/:id`.
-    - **Context Logic**: `/loc/:id` checks if box exists.
-        - If YES: Opens Camera immediately.
-        - If NO: Shows "Initialize Box" UI.
-- **Tools**:
-    - Created **Label Generator** (`/tools`): Generates CSV with QR codes for bulk printing.
-- **Backend**:
-    - Updated `LocationCreate` schema to accept manual IDs.
-    - Added duplicate ID check in `create_location`.
+## [1.0.0] - 2025-12-04
 
-### [0.3.0] - 2025-12-02
-### Added
-- **Workflow Optimization ("The Loop")**:
-    - **Upload Queue**: Implemented `UploadContext` to handle uploads in background.
-    - **Optimistic UI**: Camera resets instantly after capture, while upload happens in background.
-    - **Offline Resilience**: Queue persists to LocalStorage (metadata) and retries on failure.
-- **UI Polish**:
-    - **HUD Upgrade**: "Current Box" overlay is now larger, high-contrast (Yellow on Black), and shows box name clearly.
+### 🎉 Release Iniziale
 
-### [0.4.0] - 2025-12-02
-### Added
-- **Chaos Management**:
-    - **Pocket Logic**:
-        - Implemented `PocketContext` to manage items "in hand".
-        - Added "Add to Pocket" button in Search.
-        - Added "Empty Pocket" button in Location View (Bulk Move).
-    - **Flash Move**:
-        - Created Search Page (`/search`).
-        - Implemented "Flash Move" flow: Search -> Select -> Scan New Box.
-    - **Backend**:
-        - Added `POST /items/bulk-update` endpoint for mass item relocation.
+#### Backend (FastAPI + SQLite)
+- Struttura modulare: `database/`, `routers/`, `services/`
+- Database SQLite con WAL mode per concorrenza multi-utente
+- FTS5 (Full-Text Search) per ricerca veloce
+- API CRUD complete per Locations e Items
+- Upload immagini con resize automatico (1200px) e thumbnail (300px)
+- Correzione rotazione EXIF per foto iPhone
+- Endpoint `/api/locations/claim/{id}` per deep linking da QR
+- Bulk move per Pocket Logic
 
+#### Frontend (React + Vite + Tailwind)
+- PWA con manifest e service worker
+- Dark mode con design system personalizzato
+- Camera HUD con nome scatola sovrapposto
+- Scanner QR con html5-qrcode
+- Ali-Hack: Clean Share per ricerca visiva (Google Lens/AliExpress)
+- Auto-paste descrizione al ritorno dall'app
+- Pocket Logic: tasca digitale per spostamenti multipli
+- Flash Move: ricerca → scan → sposta
+- Label Generator: export CSV per etichettatrici
 
+#### Pagine
+- Home: dashboard con stats e lista locations
+- Location: vista scatola con griglia items
+- Search: ricerca FTS con risultati in tempo reale
+- Tools: generatore etichette CSV
+- ItemDetail: dettaglio oggetto con azioni
 
+#### Docker
+- Build multi-stage (Node + Python)
+- Configurato per deploy su Synology via GitHub PAT
+- Volume persistente per database e uploads
