@@ -22,8 +22,8 @@ export function HomePage() {
 
     // Fetch items in hand details
     const { data: inHandItems } = useQuery({
-        queryKey: ['items-in-hand'],
-        queryFn: () => itemsApi.listInHand(),
+        queryKey: ['items-in-hand', pocketItems],
+        queryFn: () => itemsApi.inHand(),
         enabled: pocketItems.length > 0
     })
 

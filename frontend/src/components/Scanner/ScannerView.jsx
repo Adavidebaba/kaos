@@ -1,7 +1,8 @@
 /**
  * ScannerView - Scanner QR Code per scansione scatole
+ * Supporta: navigazione, riponi tutti, riponi singolo
  */
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useScanner } from '../../hooks'
 import { useUIStore, usePocketStore } from '../../store'
@@ -10,8 +11,19 @@ import { itemsApi } from '../../api'
 export function ScannerView({ onClose, mode = 'navigate' }) {
     const navigate = useNavigate()
     const { showToast, closeScanner } = useUIStore()
-    const { pocketItems, clearPocket } = usePocketStore()
+    const { pocketItems, removeFromPocket, clearPocket } = usePocketStore()
     const containerId = useRef(`scanner-${Date.now()}`).current
+
+    // Controlla se c'è un singolo item da riporre (salvato da Home.jsx)
+    const [singleItemId, setSingleItemId] = useState(null)
+
+    useEffect(() => {
+        const savedItemId = sessionStorage.getItem('reponi_single_item')
+        if (savedItemId) {
+            setSingleItemId(parseInt(savedItemId, 10))
+            sessionStorage.removeItem('reponi_single_item')
+        }
+    }, [])
 
     const handleScan = async (qrText) => {
         // Parse location ID dal QR
@@ -27,9 +39,21 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
             navigator.vibrate([100, 50, 100])
         }
 
-        // Comportamento basato su mode
+        // CASO 1: Riponi singolo item
+        if (singleItemId) {
+            try {
+                await itemsApi.bulkMove([singleItemId], locationId)
+                removeFromPocket(singleItemId)
+                showToast('✅ Oggetto spostato!', 'success')
+                closeScanner()
+            } catch (err) {
+                showToast(`❌ ${err.message}`, 'error')
+            }
+            return
+        }
+
+        // CASO 2: Pocket mode - sposta TUTTI gli items nella location
         if (mode === 'pocket' && pocketItems.length > 0) {
-            // Pocket mode: sposta items nella location
             try {
                 await itemsApi.bulkMove(pocketItems, locationId)
                 clearPocket()
@@ -38,18 +62,18 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
             } catch (err) {
                 showToast(`❌ ${err.message}`, 'error')
             }
-        } else {
-            // Navigate mode: vai alla location
-            closeScanner()
-            navigate(`/loc/${locationId}`)
+            return
         }
+
+        // CASO 3: Navigate mode - vai alla location
+        closeScanner()
+        navigate(`/loc/${locationId}`)
     }
 
     const { containerRef, isScanning, error, startScanning, stopScanning, parseLocationFromQR } = useScanner(handleScan)
 
     // Avvia scanner all'apertura
     useEffect(() => {
-        // Assegna ID al container ref
         if (containerRef.current) {
             containerRef.current.id = containerId
         }
@@ -66,8 +90,21 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
 
     const handleClose = () => {
         stopScanning()
+        // Pulisci eventuali item singoli salvati
+        sessionStorage.removeItem('reponi_single_item')
         if (onClose) onClose()
         else closeScanner()
+    }
+
+    // Determina il messaggio da mostrare
+    const getMessage = () => {
+        if (singleItemId) {
+            return '📦 Scansiona dove posare l\'oggetto'
+        }
+        if (mode === 'pocket' && pocketItems.length > 0) {
+            return `📦 Scansiona dove posare ${pocketItems.length} oggetti`
+        }
+        return '📷 Inquadra il QR della scatola'
     }
 
     return (
@@ -87,10 +124,7 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
             {/* Istruzioni */}
             <div className="absolute top-20 inset-x-0 text-center z-10 safe-top">
                 <p className="text-white text-lg font-medium drop-shadow-lg">
-                    {mode === 'pocket'
-                        ? `📦 Scansiona dove posare ${pocketItems.length} oggetti`
-                        : '📷 Inquadra il QR della scatola'
-                    }
+                    {getMessage()}
                 </p>
             </div>
 

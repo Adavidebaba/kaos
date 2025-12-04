@@ -53,25 +53,6 @@ export function Layout() {
                 <Outlet />
             </main>
 
-            {/* Pocket Footer (se ci sono items in mano) */}
-            {pocketItems.length > 0 && (
-                <div className="fixed bottom-16 inset-x-0 z-20 px-4 pb-2 animate-slide-up">
-                    <button
-                        onClick={() => {
-                            const msg = pocketItems.length === 1
-                                ? '⚠️ Scansiona il QR della scatola dove vuoi posare l\'oggetto.'
-                                : `⚠️ Stai per posare TUTTI i ${pocketItems.length} oggetti in mano nella stessa scatola.\n\nScansiona il QR della scatola di destinazione.\n\nVuoi procedere?`
-                            if (pocketItems.length === 1 || confirm(msg)) {
-                                openScanner()
-                            }
-                        }}
-                        className="w-full btn bg-amber-500 text-dark-900 font-bold py-4 rounded-2xl shadow-lg shadow-amber-500/30"
-                    >
-                        👜 {pocketItems.length} in mano — Posa {pocketItems.length > 1 ? 'TUTTI ' : ''}nella scatola
-                    </button>
-                </div>
-            )}
-
             {/* Bottom Navigation */}
             <nav className="safe-bottom fixed bottom-0 inset-x-0 z-30 bg-dark-800/95 backdrop-blur-sm border-t border-dark-700">
                 <div className="flex justify-around items-center py-2">
