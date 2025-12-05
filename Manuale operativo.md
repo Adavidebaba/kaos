@@ -34,8 +34,8 @@ Non costruire tutto insieme. Segui questi 4 Layer progressivi.
 *Questa è la funzione più usata. Deve essere perfetta.*
 
 1. **L'Esperienza "HUD":**  
-   * L'utente deve sapere sempre in che scatola sta mettendo gli oggetti.  
-   * **Implementazione:** Nella vista fotocamera, sovraimprimi un \<div\> semitrasparente con il nome della Location (es. "SCATOLA A1").  
+   * L'utente deve sapere sempre in che posizione sta mettendo gli oggetti.  
+   * **Implementazione:** Nella vista fotocamera, sovraimprimi un \<div\> semitrasparente con il nome della Location (es. "POSIZIONE A1").  
 2. **Il Modulo "Ali-Hack" (Ricerca Visiva):**  
    * Il cliente non vuole scrivere descrizioni. Vuole usare la ricerca per immagini di Google/AliExpress.  
    * **Il problema:** Non possiamo integrare le loro API.  
@@ -51,10 +51,10 @@ Non costruire tutto insieme. Segui questi 4 Layer progressivi.
 
 1. **Flash Move (Teletrasporto):**  
    * Scenario: L'utente sposta un oggetto senza dire nulla, poi vuole aggiornare la posizione.  
-   * **Flow:** Cerca Oggetto \-\> Click \-\> Si apre subito la Camera \-\> Scansiona nuova Scatola \-\> Update DB.  
+   * **Flow:** Cerca Oggetto \-\> Click \-\> Si apre subito la Camera \-\> Scansiona nuova Posizione \-\> Update DB.  
    * È un'azione atomica. Non fargli aprire la scheda dettaglio.  
 2. **Pocket Logic (Tasca Digitale):**  
-   * Scenario: Prendo 5 cose, vado in garage, le butto in una scatola.  
+   * Scenario: Prendo 5 cose, vado in garage, le butto in una posizione.  
    * **Implementazione:**  
      * Stato globale pocketItems (array di ID).  
      * Tasto "Prendo" su un item \-\> Aggiunge ID all'array.  
@@ -69,8 +69,8 @@ Non costruire tutto insieme. Segui questi 4 Layer progressivi.
    * Colonne: ID, Nome, URL.  
    * **Deep Link:** L'URL nel QR Code deve essere https://\[IP-NAS\]/loc/\[ID\].  
 2. **Routing Intelligente:**  
-   * Se l'utente apre quel link (/loc/100), l'app deve aprirsi, settare il contesto su "Scatola 100" e accendere la fotocamera.  
-   * Se la Scatola 100 non esiste nel DB \-\> Mostra form "Nuova Scatola" \-\> Crea \-\> Accendi Camera.
+   * Se l'utente apre quel link (/loc/100), l'app deve aprirsi, settare il contesto su "Posizione 100" e accendere la fotocamera.  
+   * Se la Posizione 100 non esiste nel DB \-\> Mostra form "Nuova Posizione" \-\> Crea \-\> Accendi Camera.
 
 ## **🚫 COSA NON FARE (Per ora)**
 

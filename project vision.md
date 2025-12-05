@@ -18,7 +18,7 @@ L'utente tipo di questa app è un "Inguaribile Creatore di Caos":
 L'app si basa su un principio logistico industriale adattato alla pigrizia umana:  
 "Non importa DOVE metti le cose, purché il sistema sappia che sono LÌ."
 
-* **Nessun Ordine Fisico:** Cavi, lampadine e colla possono stare nella stessa scatola.  
+* **Nessun Ordine Fisico:** Cavi, lampadine e colla possono stare nella stessa posizione.  
 * **Ordine Digitale Assoluto:** L'app è l'unica fonte di verità.  
 * **Speed-First:** Ogni azione che richiede più di **3 secondi** è un fallimento. Se l'app è lenta o macchinosa, l'utente smetterà di usarla e tornerà il caos.
 
@@ -33,17 +33,17 @@ L'utente non sa come descrivere l'oggetto (es. "Cosino di plastica nero").
 
 ### **B. Tolleranza all'Errore (Context HUD)**
 
-L'utente è distratto. Mentre inserisce oggetti, rischia di metterli nella scatola sbagliata.
+L'utente è distratto. Mentre inserisce oggetti, rischia di metterli nella posizione sbagliata.
 
-* **Soluzione:** L'app deve "urlare" visivamente il contesto. Quando la fotocamera è aperta, il nome della scatola (es. "SCATOLA 100") deve essere stampato sopra l'immagine (HUD).
+* **Soluzione:** L'app deve "urlare" visivamente il contesto. Quando la fotocamera è aperta, il nome della posizione (es. "POSIZIONE 100") deve essere stampato sopra l'immagine (HUD).
 
 ### **C. Gestione della Pigrizia (Flash Move & Pockets)**
 
 L'utente prende un oggetto e lo sposta senza dirlo all'app. Giorni dopo, vuole rimetterlo a posto ma non si ricorda dov'era.
 
 * **Soluzione:** Non costringere l'utente a procedure formali.  
-  * **Flash Move:** Cerca l'oggetto \-\> Scansiona NUOVA scatola \-\> Fatto. (Teletrasporto).  
-  * **Tasca Digitale:** "Ho questo in mano" \-\> "Lo butto in questa scatola a caso". Fatto.
+  * **Flash Move:** Cerca l'oggetto \-\> Scansiona NUOVA posizione \-\> Fatto. (Teletrasporto).  
+  * **Tasca Digitale:** "Ho questo in mano" \-\> "Lo butto in questa posizione a caso". Fatto.
 
 ## **4\. User Stories (I Casi d'Uso Reali)**
 
@@ -54,8 +54,8 @@ L'app deve generare un CSV di etichette con QR Code (Deep Link) da stampare in b
 
 **Scenario 2: Il Garage nel Weekend (Inserimento)**
 
-"Ho uno scatolone di roba mista. Voglio svuotarlo dentro la Scatola 45 il più velocemente possibile."  
-L'utente scansiona la Scatola 45\. L'app entra in "Loop Mode".  
+"Ho uno scatolone di roba mista. Voglio svuotarlo dentro la Posizione 45 il più velocemente possibile."  
+L'utente scansiona la Posizione 45\. L'app entra in "Loop Mode".  
 Foto Oggetto 1 \-\> Share to Ali \-\> Incolla \-\> Salva.  
 (L'app si resetta istantaneamente).  
 Foto Oggetto 2 \-\> Salva (senza nome).  
@@ -64,8 +64,8 @@ Il tutto avviene senza tempi di caricamento visibili (Fire & Forget).
 
 **Scenario 3: Il "Pentito" (Mantenimento)**
 
-"Ho trovato un cacciavite sul tavolo. Non so da dove viene. Voglio solo metterlo via nella scatola che ho davanti."  
-L'utente apre l'app \-\> Cerca "Cacciavite" \-\> Preme sul risultato \-\> Si apre la fotocamera \-\> Scansiona la scatola davanti a sé.  
+"Ho trovato un cacciavite sul tavolo. Non so da dove viene. Voglio solo metterlo via nella posizione che ho davanti."  
+L'utente apre l'app \-\> Cerca "Cacciavite" \-\> Preme sul risultato \-\> Si apre la fotocamera \-\> Scansiona la posizione davanti a sé.  
 L'app aggiorna la posizione. L'utente non deve sapere dov'era prima il cacciavite.
 
 ## **5\. Nota Tecnica per lo Sviluppatore**

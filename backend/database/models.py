@@ -25,7 +25,7 @@ class ItemStatus(enum.Enum):
 
 class Location(Base):
     """
-    Rappresenta una location (scatola, scaffale, stanza).
+    Rappresenta una location (posizione, scaffale, stanza).
     Supporta gerarchia tramite parent_id.
     """
     __tablename__ = "locations"

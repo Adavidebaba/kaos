@@ -1,5 +1,5 @@
 /**
- * LocationCard - Card per visualizzazione location (scatola)
+ * LocationCard - Card per visualizzazione location (posizione)
  */
 export function LocationCard({ location, onClick }) {
     return (

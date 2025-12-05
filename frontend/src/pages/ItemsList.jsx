@@ -56,7 +56,7 @@ export function ItemsListPage() {
                 <EmptyState
                     icon="📭"
                     title="Nessun oggetto"
-                    description="Aggiungi il tuo primo oggetto scansionando una scatola"
+                    description="Aggiungi il tuo primo oggetto scansionando una posizione"
                 />
             )}
         </div>

@@ -1,5 +1,5 @@
 /**
- * LocationPage - Vista singola scatola con items
+ * LocationPage - Vista singola posizione con items
  * Gestisce Deep Linking da QR Code e parametro ?camera=true
  */
 import { useState, useEffect } from 'react'
@@ -58,13 +58,13 @@ export function LocationPage() {
 
     // Claim (crea) nuova location
     const handleClaim = async () => {
-        const name = claimName.trim() || `Scatola ${locationId}`
+        const name = claimName.trim() || `Posizione ${locationId}`
 
         setIsClaiming(true)
         try {
             await locationsApi.claim(locationId, { name })
 
-            showToast('✅ Scatola creata!', 'success')
+            showToast('✅ Posizione creata!', 'success')
 
             // Refresh data
             queryClient.invalidateQueries(['location', locationId])
@@ -100,7 +100,7 @@ export function LocationPage() {
 
     // Loading
     if (isLoading) {
-        return <LoadingPage message="Caricamento scatola..." />
+        return <LoadingPage message="Caricamento posizione..." />
     }
 
     // Location non esiste -> Modal per crearla
@@ -109,17 +109,17 @@ export function LocationPage() {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
                 <div className="card p-6 max-w-sm w-full animate-slide-up">
                     <h2 className="text-xl font-bold text-white mb-2">
-                        📦 Nuova Scatola
+                        📦 Nuova Posizione
                     </h2>
                     <p className="text-dark-400 text-sm mb-4">
-                        La scatola #{locationId} non esiste ancora. Vuoi crearla?
+                        La posizione #{locationId} non esiste ancora. Vuoi crearla?
                     </p>
 
                     <input
                         type="text"
                         value={claimName}
                         onChange={(e) => setClaimName(e.target.value)}
-                        placeholder={`Scatola ${locationId}`}
+                        placeholder={`Posizione ${locationId}`}
                         className="input mb-4"
                         autoFocus
                     />
@@ -162,7 +162,7 @@ export function LocationPage() {
         return (
             <EmptyState
                 icon="❓"
-                title="Scatola non trovata"
+                title="Posizione non trovata"
                 action={
                     <button onClick={() => navigate('/')} className="btn-primary mt-4">
                         🏠 Torna alla Home
@@ -240,7 +240,7 @@ export function LocationPage() {
                 ) : (
                     <EmptyState
                         icon="📭"
-                        title="Scatola vuota"
+                        title="Posizione vuota"
                         description="Aggiungi il primo oggetto"
                         action={
                             <button

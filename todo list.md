@@ -32,7 +32,7 @@ L'obiettivo è avere un ambiente Docker stabile che supporti HTTPS (obbligatorio
   * \[ \] **Thumbnails**: Generare *sempre* una miniatura (max 300px webp/jpg) al salvataggio. Le API di lista devono restituire il path della thumbnail.  
 * \[ \] **API Endpoints (CRUD Base)**  
   * \[ \] GET /locations: Includere conteggio items per location ("Bin Density").  
-  * \[ \] POST /locations: Creazione nuova scatola.  
+  * \[ \] POST /locations: Creazione nuova posizione.  
   * \[ \] GET /items: Supporto paginazione e filtri.  
   * \[ \] POST /items: Creazione item.  
   * \[ \] PATCH /items/{id}: Per spostamenti e "Soft Delete".  
@@ -59,7 +59,7 @@ L'obiettivo è avere un ambiente Docker stabile che supporti HTTPS (obbligatorio
   * \[ \] Gestire rotta /loc/:id.  
   * \[ \] Logica: All'apertura di /loc/100:  
     * \[ \] Se ID esiste: Impostare "Context" su Location 100 \-\> Aprire Camera Inserimento.  
-    * \[ \] Se ID non esiste: Aprire Modal "Claiming" (Attiva Scatola) \-\> Crea Location \-\> Apri Camera.  
+    * \[ \] Se ID non esiste: Aprire Modal "Claiming" (Attiva Posizione) \-\> Crea Location \-\> Apri Camera.  
 * \[ \] **Tools: Label Generator**  
   * \[ \] Pagina /tools.  
   * \[ \] Form: Range ID (da 100 a 200), Base URL.  
@@ -68,7 +68,7 @@ L'obiettivo è avere un ambiente Docker stabile che supporti HTTPS (obbligatorio
 ## **📸 FASE 4: Il Workflow di Inserimento ("The Loop")**
 
 * \[ \] **Camera HUD (Heads-Up Display)**  
-  * \[ \] Sovraimprimere il nome della Location corrente (es. "SCATOLA A1") al centro della vista fotocamera (opacity 50%, testo grande).  
+  * \[ \] Sovraimprimere il nome della Location corrente (es. "POSIZIONE A1") al centro della vista fotocamera (opacity 50%, testo grande).  
   * \[ \] Tasto "Torcia" manuale.  
 * \[ \] **Modulo "Ali-Hack" (Magic Search)**  
   * \[ \] Implementare tasto "Cerca su Cataloghi".  
@@ -99,7 +99,7 @@ L'obiettivo è avere un ambiente Docker stabile che supporti HTTPS (obbligatorio
     * \[ \] Tasto "Crea Nuovo" se non trovato (scatto foto rapido).  
   * \[ \] **Step 2 (Target)**: Apertura immediata Scanner QR.  
   * \[ \] **Step 3**: Update DB e Toast di conferma.  
-* \[ \] **Bulk Move (Svuota Scatola)**  
+* \[ \] **Bulk Move (Svuota Posizione)**  
   * \[ \] Nella vista Location, tasto "Sposta tutto il contenuto".  
   * \[ \] Scan nuova Location \-\> Update massivo location\_id.
 

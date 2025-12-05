@@ -4,7 +4,7 @@
  * Props:
  * - item: oggetto item
  * - onClick: callback click (navigazione)
- * - showLocation: mostra nome scatola
+ * - showLocation: mostra nome posizione
  * - showActions: mostra pulsanti Prendi/Riponi/Sposta (default true)
  * - onSposta: callback per Sposta (apre scanner)
  */
@@ -37,11 +37,11 @@ export function ItemCard({
         }
     }
 
-    // Riponi nella scatola originale (senza scanner)
+    // Riponi nella posizione originale (senza scanner)
     const handleRiponi = async (e) => {
         e.stopPropagation()
         if (!item.location_id) {
-            showToast('❌ Scatola originale non trovata', 'error')
+            showToast('❌ Posizione originale non trovata', 'error')
             return
         }
         try {
@@ -55,7 +55,7 @@ export function ItemCard({
         }
     }
 
-    // Sposta in nuova scatola (apre scanner)
+    // Sposta in nuova posizione (apre scanner)
     const handleSposta = (e) => {
         e.stopPropagation()
         // Salva item da spostare e apri scanner
@@ -76,7 +76,7 @@ export function ItemCard({
 
     const badge = statusBadge[item.status] || statusBadge.available
 
-    // Abbrevia nome scatola per pulsante
+    // Abbrevia nome posizione per pulsante
     const shortLocationName = item.location_name
         ? (item.location_name.length > 12 ? item.location_name.substring(0, 12) + '…' : item.location_name)
         : '?'
@@ -118,7 +118,7 @@ export function ItemCard({
                 <div className="absolute top-2 right-2 flex gap-1">
                     {inPocket ? (
                         <>
-                            {/* Riponi nella scatola originale */}
+                            {/* Riponi nella posizione originale */}
                             <button
                                 onClick={handleRiponi}
                                 className="px-2 py-1 rounded-lg text-[10px] font-medium
@@ -128,7 +128,7 @@ export function ItemCard({
                             >
                                 📦 {shortLocationName}
                             </button>
-                            {/* Sposta in altra scatola */}
+                            {/* Sposta in altra posizione */}
                             <button
                                 onClick={handleSposta}
                                 className="px-2 py-1 rounded-lg text-[10px] font-medium

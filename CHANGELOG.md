@@ -19,7 +19,7 @@ Tutte le modifiche significative al progetto Magazzino "Caos Ordinato".
 #### Frontend (React + Vite + Tailwind)
 - PWA con manifest e service worker
 - Dark mode con design system personalizzato
-- Camera HUD con nome scatola sovrapposto
+- Camera HUD con nome posizione sovrapposto
 - Scanner QR con html5-qrcode
 - Ali-Hack: Clean Share per ricerca visiva (Google Lens/AliExpress)
 - Auto-paste descrizione al ritorno dall'app
@@ -29,7 +29,7 @@ Tutte le modifiche significative al progetto Magazzino "Caos Ordinato".
 
 #### Pagine
 - Home: dashboard con stats e lista locations
-- Location: vista scatola con griglia items
+- Location: vista posizione con griglia items
 - Search: ricerca FTS con risultati in tempo reale
 - Tools: generatore etichette CSV
 - ItemDetail: dettaglio oggetto con azioni

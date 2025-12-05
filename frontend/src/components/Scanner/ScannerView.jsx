@@ -113,7 +113,7 @@ export function ScannerView({ onClose, mode = 'navigate' }) {
         if (mode === 'pocket' && pocketItems.length > 0) {
             return `📦 Scansiona dove posare ${pocketItems.length} oggetti`
         }
-        return '📷 Inquadra il QR della scatola'
+        return '📷 Inquadra il QR della posizione'
     }
 
     return (

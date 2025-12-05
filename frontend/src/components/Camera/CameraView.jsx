@@ -133,10 +133,10 @@ export function CameraView({ locationId, locationName, onClose, onSave }) {
                 />
             )}
 
-            {/* HUD Overlay - Nome Scatola */}
+            {/* HUD Overlay - Nome Posizione */}
             <div className="hud-overlay">
                 <div className="hud-label">
-                    📦 {locationName || `Scatola ${locationId}`}
+                    📦 {locationName || `Posizione ${locationId}`}
                 </div>
             </div>
 

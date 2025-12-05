@@ -26,7 +26,7 @@ Azione che apre un modal a due step:
 * Action: Scansione QR Location.  
 * **Logic:**  
   * Esegue UPDATE items SET location\_id \= SCANNED\_ID, status \= AVAILABLE WHERE id \= SELECTED\_ID.  
-  * Feedback Aptico (Success) \+ Toast: "Spostato in \[Nome Scatola\]".  
+  * Feedback Aptico (Success) \+ Toast: "Spostato in \[Nome Posizione\]".  
   * Reset immediato alla Home.
 
 ## **3\. Prevenzione Errori (Disambiguazione)**

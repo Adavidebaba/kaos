@@ -14,7 +14,7 @@ export function ToolsPage() {
     const [rangeStart, setRangeStart] = useState(100)
     const [rangeEnd, setRangeEnd] = useState(150)
     const [baseUrl, setBaseUrl] = useState('https://kaos.adavide.com')
-    const [prefix, setPrefix] = useState('Scatola')
+    const [prefix, setPrefix] = useState('Posizione')
 
     // Fetch items senza descrizione
     const { data: itemsData } = useQuery({
@@ -164,7 +164,7 @@ export function ToolsPage() {
                             value={prefix}
                             onChange={(e) => setPrefix(e.target.value)}
                             className="input"
-                            placeholder="es. Scatola, Box, S"
+                            placeholder="es. Posizione, Box, S"
                         />
                     </div>
 

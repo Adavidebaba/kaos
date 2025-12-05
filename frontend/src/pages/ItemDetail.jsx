@@ -45,10 +45,10 @@ export function ItemDetailPage() {
         }
     }
 
-    // Riponi nella scatola originale (senza scanner)
+    // Riponi nella posizione originale (senza scanner)
     const handleRiponiOriginale = async () => {
         if (!item?.location_id) {
-            showToast('❌ Scatola originale non trovata', 'error')
+            showToast('❌ Posizione originale non trovata', 'error')
             return
         }
         try {
@@ -62,7 +62,7 @@ export function ItemDetailPage() {
         }
     }
 
-    // Sposta in nuova scatola (apre scanner)
+    // Sposta in nuova posizione (apre scanner)
     const handleSposta = () => {
         sessionStorage.setItem('reponi_single_item', itemId.toString())
         openScanner('pocket')
@@ -145,14 +145,14 @@ export function ItemDetailPage() {
             <div className="flex gap-2">
                 {inPocket ? (
                     <>
-                        {/* Riponi nella scatola originale */}
+                        {/* Riponi nella posizione originale */}
                         <button
                             onClick={handleRiponiOriginale}
                             className="btn flex-1 bg-green-600 hover:bg-green-500 text-white font-bold"
                         >
                             📦 Riponi in: {item.location_name || '?'}
                         </button>
-                        {/* Sposta in altra scatola */}
+                        {/* Sposta in altra posizione */}
                         <button
                             onClick={handleSposta}
                             className="btn-secondary px-3 text-sm"

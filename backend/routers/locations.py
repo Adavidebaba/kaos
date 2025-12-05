@@ -127,7 +127,7 @@ def create_location(
 ):
     """
     Crea una nuova location.
-    Usato quando si scansiona un QR di una scatola non ancora registrata.
+    Usato quando si scansiona un QR di una posizione non ancora registrata.
     """
     # Verifica parent se specificato
     if data.parent_id:

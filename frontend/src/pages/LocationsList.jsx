@@ -1,6 +1,6 @@
 /**
  * LocationsList - Elenco tutte le scatole
- * Con modalità selezione per "Scegli Scatola"
+ * Con modalità selezione per "Scegli Posizione"
  */
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -24,7 +24,7 @@ export function LocationsListPage() {
 
     const handleLocationClick = (location) => {
         if (isSelectMode) {
-            // Vai direttamente alla camera per questa scatola
+            // Vai direttamente alla camera per questa posizione
             navigate(`/loc/${location.id}?camera=true`)
         } else {
             // Navigazione normale
@@ -47,14 +47,14 @@ export function LocationsListPage() {
                     ← Indietro
                 </button>
                 <h1 className="text-lg font-bold text-white">
-                    {isSelectMode ? 'Scegli Scatola' : 'Tutte le Scatole'}
+                    {isSelectMode ? 'Scegli Posizione' : 'Tutte le Scatole'}
                 </h1>
                 <div className="w-16" /> {/* Spacer */}
             </div>
 
             {isSelectMode && (
                 <p className="text-dark-400 text-sm text-center">
-                    Seleziona la scatola dove aggiungere l'oggetto
+                    Seleziona la posizione dove aggiungere l'oggetto
                 </p>
             )}
 
@@ -72,8 +72,8 @@ export function LocationsListPage() {
             ) : (
                 <EmptyState
                     icon="📭"
-                    title="Nessuna scatola"
-                    description="Scansiona un QR code per creare la tua prima scatola"
+                    title="Nessuna posizione"
+                    description="Scansiona un QR code per creare la tua prima posizione"
                     action={
                         <button onClick={openScanner} className="btn-primary mt-2">
                             📷 Scansiona QR

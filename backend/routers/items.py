@@ -172,7 +172,7 @@ def get_item(
             detail="Item non trovato"
         )
     
-    # Se item è in mano, usa previous_location per mostrare la scatola originale
+    # Se item è in mano, usa previous_location per mostrare la posizione originale
     if item.status == ItemStatus.IN_HAND and item.previous_location_id:
         prev_loc = db.query(Location).filter(Location.id == item.previous_location_id).first()
         return ItemResponse(
@@ -321,7 +321,7 @@ def pick_item(
 ):
     """
     Prende un item in mano (Pocket Logic: PRENDO ✋).
-    Salva previous_location_id per ricordare la scatola originale.
+    Salva previous_location_id per ricordare la posizione originale.
     """
     item = db.query(Item).filter(
         Item.id == item_id,
@@ -353,7 +353,7 @@ def pick_item(
     
     return ItemResponse(
         id=item.id,
-        location_id=item.previous_location_id,  # Ritorna la scatola originale!
+        location_id=item.previous_location_id,  # Ritorna la posizione originale!
         location_name=prev_loc_name,
         photo_path=item.photo_path,
         thumbnail_path=item.thumbnail_path,

@@ -32,10 +32,10 @@ export function HomePage() {
         enabled: pocketItems.length > 0
     })
 
-    // Riponi in scatola originale (senza scanner)
+    // Riponi in posizione originale (senza scanner)
     const handleRiponiOriginale = async (item) => {
         if (!item.location_id) {
-            showToast('❌ Scatola originale non trovata', 'error')
+            showToast('❌ Posizione originale non trovata', 'error')
             return
         }
         try {
@@ -49,17 +49,17 @@ export function HomePage() {
         }
     }
 
-    // Sposta in nuova scatola (apre scanner)
+    // Sposta in nuova posizione (apre scanner)
     const handleSposta = (itemId) => {
         sessionStorage.setItem('reponi_single_item', itemId.toString())
         openScanner('pocket')
     }
 
-    // Sposta tutti in nuova scatola
+    // Sposta tutti in nuova posizione
     const handleSpostaTutti = () => {
         const msg = pocketItems.length === 1
-            ? 'Scansiona il QR della scatola dove vuoi spostare l\'oggetto.'
-            : `Stai per spostare TUTTI i ${pocketItems.length} oggetti nella stessa scatola.\n\nScansiona il QR della scatola di destinazione.`
+            ? 'Scansiona il QR della posizione dove vuoi spostare l\'oggetto.'
+            : `Stai per spostare TUTTI i ${pocketItems.length} oggetti nella stessa posizione.\n\nScansiona il QR della posizione di destinazione.`
         if (pocketItems.length === 1 || confirm(msg)) {
             openScanner('pocket')
         }
@@ -121,13 +121,13 @@ export function HomePage() {
                         onClick={openScanner}
                         className="btn-secondary py-4 text-base"
                     >
-                        📷 Scansiona Scatola
+                        📷 Scansiona Posizione
                     </button>
                     <button
                         onClick={() => navigate('/locations?select=true')}
                         className="btn-secondary py-4 text-base"
                     >
-                        📦 Scegli Scatola
+                        📦 Scegli Posizione
                     </button>
                 </div>
             </section>
@@ -161,7 +161,7 @@ export function HomePage() {
                                             {item.description || 'Senza descrizione'}
                                         </p>
                                     </div>
-                                    {/* Riponi nella scatola originale */}
+                                    {/* Riponi nella posizione originale */}
                                     <button
                                         onClick={() => handleRiponiOriginale(item)}
                                         className="btn text-sm px-3 py-2 bg-green-600 hover:bg-green-500 text-white font-bold"
@@ -169,7 +169,7 @@ export function HomePage() {
                                     >
                                         📦 {item.location_name || '?'}
                                     </button>
-                                    {/* Sposta in altra scatola */}
+                                    {/* Sposta in altra posizione */}
                                     <button
                                         onClick={() => handleSposta(item.id)}
                                         className="btn-secondary text-[11px] px-2 py-2"
@@ -195,7 +195,7 @@ export function HomePage() {
                         onClick={handleSpostaTutti}
                         className="w-full btn bg-amber-500 text-dark-900 font-bold py-4 rounded-2xl"
                     >
-                        ↪️ Sposta {pocketItems.length > 1 ? 'TUTTI ' : ''}in nuova scatola
+                        ↪️ Sposta {pocketItems.length > 1 ? 'TUTTI ' : ''}in nuova posizione
                     </button>
                 </section>
             )}
@@ -204,7 +204,7 @@ export function HomePage() {
             {pocketItems.length === 0 && (
                 <section className="text-center py-8 text-dark-500">
                     <p className="text-4xl mb-2">👋</p>
-                    <p>Scansiona una scatola per iniziare</p>
+                    <p>Scansiona una posizione per iniziare</p>
                 </section>
             )}
         </div>
