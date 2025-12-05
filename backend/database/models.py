@@ -52,7 +52,8 @@ class Location(Base):
     items = relationship(
         "Item", 
         back_populates="location",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        foreign_keys="Item.location_id"
     )
     
     @property
