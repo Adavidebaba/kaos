@@ -150,7 +150,7 @@ export function HomePage() {
                                     <img
                                         src={`/${item.thumbnail_path}`}
                                         alt=""
-                                        className="w-12 h-12 rounded-lg object-cover bg-dark-700 cursor-pointer"
+                                        className="w-16 h-16 rounded-lg object-cover bg-dark-700 cursor-pointer"
                                         onClick={() => navigate(`/item/${item.id}`)}
                                     />
                                     <div
@@ -164,17 +164,17 @@ export function HomePage() {
                                     {/* Riponi nella scatola originale */}
                                     <button
                                         onClick={() => handleRiponiOriginale(item)}
-                                        className="btn text-[11px] px-2 py-1.5 bg-green-600 hover:bg-green-500 text-white"
+                                        className="btn text-sm px-3 py-2 bg-green-600 hover:bg-green-500 text-white font-bold"
                                         title={`Riponi in ${item.location_name}`}
                                     >
-                                        📦 {item.location_name?.substring(0, 10) || '?'}
+                                        📦 {item.location_name || '?'}
                                     </button>
                                     {/* Sposta in altra scatola */}
                                     <button
                                         onClick={() => handleSposta(item.id)}
-                                        className="btn-secondary text-[11px] px-2 py-1.5"
+                                        className="btn-secondary text-[11px] px-2 py-2"
                                     >
-                                        🚀
+                                        ↪️
                                     </button>
                                 </div>
                             ))

@@ -150,14 +150,14 @@ export function ItemDetailPage() {
                             onClick={handleRiponiOriginale}
                             className="btn flex-1 bg-green-600 hover:bg-green-500 text-white font-bold"
                         >
-                            📦 {item.location_name || 'Scatola'}
+                            📦 Riponi in: {item.location_name || '?'}
                         </button>
                         {/* Sposta in altra scatola */}
                         <button
                             onClick={handleSposta}
-                            className="btn-secondary px-4"
+                            className="btn-secondary px-3 text-sm"
                         >
-                            🚀
+                            ↪️ Nuova
                         </button>
                     </>
                 ) : (
