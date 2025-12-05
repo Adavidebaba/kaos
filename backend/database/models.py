@@ -53,7 +53,7 @@ class Location(Base):
         "Item", 
         back_populates="location",
         cascade="all, delete-orphan",
-        foreign_keys="Item.location_id"
+        primaryjoin="Location.id==Item.location_id"
     )
     
     @property
