@@ -1,15 +1,22 @@
 /**
  * Layout - Componente layout principale Mobile First
- * Con contatore oggetti senza descrizione
+ * Con contatore oggetti senza descrizione e sync pocket dal server
  */
+import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { useUIStore } from '../../store'
+import { useUIStore, usePocketStore } from '../../store'
 import { itemsApi } from '../../api'
 
 export function Layout() {
     const navigate = useNavigate()
     const { toast } = useUIStore()
+    const { syncFromServer } = usePocketStore()
+
+    // Sincronizza pocket dal server all'avvio
+    useEffect(() => {
+        syncFromServer()
+    }, [])
 
     // Conta oggetti senza descrizione
     const { data: itemsData } = useQuery({

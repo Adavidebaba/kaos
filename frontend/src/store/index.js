@@ -1,49 +1,62 @@
 /**
  * Store globale Zustand per stato applicazione
- * Gestisce: pocket items, UI state, toast
+ * Gestisce: pocket items (sincronizzato dal server), UI state, toast
  */
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 /**
  * Store per Pocket Logic (tasca digitale)
- * Persistito in localStorage per sopravvivere ai refresh
+ * SINCRONIZZATO DAL SERVER - non usa più localStorage per i dati principali
+ * Il server è la fonte di verità (item.status = IN_HAND)
  */
-export const usePocketStore = create(
-    persist(
-        (set, get) => ({
-            // Array di item IDs nella tasca
-            pocketItems: [],
+export const usePocketStore = create((set, get) => ({
+    // Array di item IDs nella tasca (dal server)
+    pocketItems: [],
 
-            // Aggiunge item alla tasca
-            addToPocket: (itemId) => {
-                const current = get().pocketItems
-                if (!current.includes(itemId)) {
-                    set({ pocketItems: [...current, itemId] })
-                }
-            },
+    // Flag per indicare se stiamo caricando dal server
+    isLoading: false,
 
-            // Rimuove item dalla tasca
-            removeFromPocket: (itemId) => {
-                set({
-                    pocketItems: get().pocketItems.filter(id => id !== itemId)
-                })
-            },
-
-            // Svuota la tasca (dopo bulk move)
-            clearPocket: () => set({ pocketItems: [] }),
-
-            // Check se item è in tasca
-            isInPocket: (itemId) => get().pocketItems.includes(itemId),
-
-            // Conteggio items in tasca
-            pocketCount: () => get().pocketItems.length
-        }),
-        {
-            name: 'kaos-pocket', // chiave localStorage
+    // Inizializza dal server (chiamato all'avvio dell'app)
+    syncFromServer: async () => {
+        set({ isLoading: true })
+        try {
+            const response = await fetch('/api/items/in-hand')
+            if (response.ok) {
+                const items = await response.json()
+                set({ pocketItems: items.map(item => item.id) })
+            }
+        } catch (err) {
+            console.error('Failed to sync pocket from server:', err)
+        } finally {
+            set({ isLoading: false })
         }
-    )
-)
+    },
+
+    // Aggiunge item alla tasca (locale, il server viene aggiornato tramite API pick)
+    addToPocket: (itemId) => {
+        const current = get().pocketItems
+        if (!current.includes(itemId)) {
+            set({ pocketItems: [...current, itemId] })
+        }
+    },
+
+    // Rimuove item dalla tasca (locale, il server viene aggiornato tramite API move)
+    removeFromPocket: (itemId) => {
+        set({
+            pocketItems: get().pocketItems.filter(id => id !== itemId)
+        })
+    },
+
+    // Svuota la tasca (dopo bulk move)
+    clearPocket: () => set({ pocketItems: [] }),
+
+    // Check se item è in tasca
+    isInPocket: (itemId) => get().pocketItems.includes(itemId),
+
+    // Conteggio items in tasca
+    pocketCount: () => get().pocketItems.length
+}))
 
 /**
  * Store per UI state (non persistito)

@@ -134,25 +134,41 @@ def list_items_in_hand(db: Session = Depends(get_db)):
     """
     Lista items nella "tasca digitale" (status IN_HAND).
     Usato per il footer Pocket Logic.
+    Restituisce previous_location per permettere il Riponi.
     """
     items = db.query(Item).filter(
         Item.status == ItemStatus.IN_HAND,
         Item.deleted_at.is_(None)
     ).order_by(Item.created_at.desc()).all()
     
-    return [
-        ItemResponse(
-            id=item.id,
-            location_id=item.location_id,
-            location_name=item.location.name if item.location else None,
-            photo_path=item.photo_path,
-            thumbnail_path=item.thumbnail_path,
-            description=item.description,
-            status=item.status,
-            created_at=item.created_at
-        )
-        for item in items
-    ]
+    result = []
+    for item in items:
+        # Usa previous_location per mostrare dove rimettere l'oggetto
+        if item.previous_location_id:
+            prev_loc = db.query(Location).filter(Location.id == item.previous_location_id).first()
+            result.append(ItemResponse(
+                id=item.id,
+                location_id=item.previous_location_id,
+                location_name=prev_loc.name if prev_loc else None,
+                photo_path=item.photo_path,
+                thumbnail_path=item.thumbnail_path,
+                description=item.description,
+                status=item.status,
+                created_at=item.created_at
+            ))
+        else:
+            result.append(ItemResponse(
+                id=item.id,
+                location_id=item.location_id,
+                location_name=item.location.name if item.location else None,
+                photo_path=item.photo_path,
+                thumbnail_path=item.thumbnail_path,
+                description=item.description,
+                status=item.status,
+                created_at=item.created_at
+            ))
+    
+    return result
 
 
 @router.get("/{item_id}", response_model=ItemResponse)
