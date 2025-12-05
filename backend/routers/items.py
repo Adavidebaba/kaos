@@ -92,20 +92,34 @@ def list_items(
                  .limit(per_page)\
                  .all()
     
-    # Costruisci risposta con location_name
+    # Costruisci risposta con location_name (o previous per IN_HAND)
     items_response = []
     for item in items:
-        loc_name = item.location.name if item.location else None
-        items_response.append(ItemResponse(
-            id=item.id,
-            location_id=item.location_id,
-            location_name=loc_name,
-            photo_path=item.photo_path,
-            thumbnail_path=item.thumbnail_path,
-            description=item.description,
-            status=item.status,
-            created_at=item.created_at
-        ))
+        # Se item è in mano, usa previous_location
+        if item.status == ItemStatus.IN_HAND and item.previous_location_id:
+            prev_loc = db.query(Location).filter(Location.id == item.previous_location_id).first()
+            items_response.append(ItemResponse(
+                id=item.id,
+                location_id=item.previous_location_id,
+                location_name=prev_loc.name if prev_loc else None,
+                photo_path=item.photo_path,
+                thumbnail_path=item.thumbnail_path,
+                description=item.description,
+                status=item.status,
+                created_at=item.created_at
+            ))
+        else:
+            loc_name = item.location.name if item.location else None
+            items_response.append(ItemResponse(
+                id=item.id,
+                location_id=item.location_id,
+                location_name=loc_name,
+                photo_path=item.photo_path,
+                thumbnail_path=item.thumbnail_path,
+                description=item.description,
+                status=item.status,
+                created_at=item.created_at
+            ))
     
     return ItemsList(
         items=items_response,
